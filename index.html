@@ -610,7 +610,7 @@
             }
 
             try {
-                let query = supabase.from('consultas').select('*');
+                let query = supabase.from('consultas').select('id, title, content, category, author_name, created_at, resolved');
 
                 if (currentCategoryFilter) {
                     query = query.eq('category', currentCategoryFilter);
@@ -732,7 +732,7 @@
                     .eq('category', cat);
 
                 if (!error) {
-                    const el = document.querySelector(`.cat - count[data - cat="${cat}"]`);
+                    const el = document.querySelector(`.cat-count[data-cat="${cat}"]`);
                     if (el) el.textContent = count || 0;
                 }
             }
