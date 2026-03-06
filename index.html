@@ -10,10 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
         tailwind.config = {
@@ -120,41 +118,12 @@
 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-4">
-                    <!-- Guest View (Login Button) -->
-                    <button id="loginBtn" onclick="signInWithGoogle()"
-                        class="hidden text-sm font-medium text-gray-700 hover:text-brand-600 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-xl transition-colors shadow-sm flex items-center gap-2">
-                        <img src="https://www.google.com/favicon.ico" class="w-4 h-4" alt="Google">
-                        Iniciar Sesión
+                    <!-- Embedded View: Mobile CTA -->
+                    <button onclick="openModal()"
+                        class="md:hidden flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-3 sm:px-4 py-2 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all">
+                        <i class="ph ph-pencil-simple text-lg"></i>
+                        <span class="hidden sm:inline">Nueva</span>
                     </button>
-
-                    <!-- Authenticated View -->
-                    <div id="userProfile" class="hidden flex items-center gap-4">
-                        <button class="text-gray-400 hover:text-gray-600 transition-colors relative">
-                            <i class="ph ph-bell text-2xl"></i>
-                            <span
-                                class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                        </button>
-                        <div class="relative group cursor-pointer">
-                            <div
-                                class="w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 overflow-hidden border border-gray-200">
-                                <img id="userAvatar" src="" alt="User Avatar" class="w-full h-full object-cover">
-                            </div>
-                            <!-- Dropdown -->
-                            <div
-                                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                <div class="px-4 py-3 border-b border-gray-50">
-                                    <p class="text-sm font-medium text-gray-900 truncate" id="userNameDisplay"></p>
-                                    <p class="text-xs text-gray-500 truncate" id="userEmailDisplay"></p>
-                                </div>
-                                <div class="py-1">
-                                    <button onclick="signOut()"
-                                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
-                                        <i class="ph ph-sign-out"></i> Cerrar Sesión
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -201,47 +170,69 @@
                     <div class="space-y-1">
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Gramática')">
+                            onclick="filterCategory('Acceso y cuenta')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-blue-400"></span>
-                                Gramática
+                                Acceso y cuenta
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Gramática">0</span>
+                                data-cat="Acceso y cuenta">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Vocabulario')">
+                            onclick="filterCategory('Formación')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-green-400"></span>
-                                Vocabulario
+                                Formación
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Vocabulario">0</span>
+                                data-cat="Formación">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Pronunciación')">
+                            onclick="filterCategory('Comunidad')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-purple-400"></span>
-                                Pronunciación
+                                Comunidad
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Pronunciación">0</span>
+                                data-cat="Comunidad">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Dudas Generales')">
+                            onclick="filterCategory('Recursos')">
                             <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-orange-400"></span>
-                                Dudas Generales
+                                <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+                                Recursos
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Dudas Generales">0</span>
+                                data-cat="Recursos">0</span>
+                        </a>
+                        <a href="#"
+                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
+                            onclick="filterCategory('Problemas técnicos')">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                                Problemas técnicos
+                            </div>
+                            <span
+                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
+                                data-cat="Problemas técnicos">0</span>
+                        </a>
+                        <a href="#"
+                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
+                            onclick="filterCategory('Método y Estudio')">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-orange-400"></span>
+                                Método y Estudio
+                            </div>
+                            <span
+                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
+                                data-cat="Método y Estudio">0</span>
                         </a>
                     </div>
                 </div>
@@ -382,7 +373,7 @@
 
             <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-gray-50/50">
 
-                <!-- Guest User Info Fields (Only shown if not logged in) -->
+                <!-- Guest User Info Fields (Always shown for embedded) -->
                 <div id="guestFields" class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Tu Nombre</label>
@@ -402,10 +393,12 @@
                         <select id="postCategory"
                             class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
                             <option value="" disabled selected>Selecciona un tema...</option>
-                            <option value="Gramática">Gramática</option>
-                            <option value="Vocabulario">Vocabulario</option>
-                            <option value="Pronunciación">Pronunciación</option>
-                            <option value="Dudas Generales">Dudas Generales</option>
+                            <option value="Acceso y cuenta">Acceso y cuenta</option>
+                            <option value="Formación">Formación</option>
+                            <option value="Comunidad">Comunidad</option>
+                            <option value="Recursos">Recursos</option>
+                            <option value="Problemas técnicos">Problemas técnicos</option>
+                            <option value="Método y Estudio">Método y Estudio</option>
                         </select>
                         <div
                             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
@@ -471,74 +464,15 @@
     </div>
 
     <script>
-        // --- Firebase Configuration ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyDOd4Y1mscWdXMg2nE7BRCDC16HlkFbWq0",
-            authDomain: "plataforma-holandes-nawar.firebaseapp.com",
-            projectId: "plataforma-holandes-nawar", // Assuming project ID based on auth domain
-            storageBucket: "plataforma-holandes-nawar.appspot.com",
-            messagingSenderId: "539343735033",
-            appId: "1:539343735033:web:your_app_id_here", // Would need real app ID, but usually works without for basics
-            measurementId: "G-3Y5BBE07CP"
-        };
+        // --- Supabase Configuration ---
+        // INSTRUCCIÓN: Rellena estas dos variables con la URL y la Anon Key de tu proyecto Supabase.
+        const supabaseUrl = 'https://alifjhqjmedstkafnrmp.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsaWZqaHFqbWVkc3RrYWZucm1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTA4MTUsImV4cCI6MjA4Nzg2NjgxNX0.Gz0tMmEy1rcNdjaH7pYkoySMm3PBczmgCuaWobMdOtQ';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        let currentUser = null;
-        let lastVisibleDoc = null;
         let currentCategoryFilter = null;
-
-        // --- Authentication Logic ---
-        function updateAuthUI(user) {
-            const loginBtn = document.getElementById('loginBtn');
-            const userProfile = document.getElementById('userProfile');
-            const guestFields = document.getElementById('guestFields');
-            const postNameInput = document.getElementById('postName');
-            const postEmailInput = document.getElementById('postEmail');
-
-            if (user) {
-                // Logged in
-                loginBtn.classList.add('hidden');
-                userProfile.classList.remove('hidden');
-                document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=f1f5f9&color=475569`;
-                document.getElementById('userNameDisplay').textContent = user.displayName;
-                document.getElementById('userEmailDisplay').textContent = user.email;
-
-                // Hide guest fields in modal, will auto-fill on submit
-                guestFields.classList.add('hidden');
-            } else {
-                // Logged out
-                loginBtn.classList.remove('hidden');
-                userProfile.classList.add('hidden');
-                guestFields.classList.remove('hidden');
-            }
-        }
-
-        auth.onAuthStateChanged((user) => {
-            currentUser = user;
-            updateAuthUI(user);
-        });
-
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch((error) => {
-                console.error("Error signing in:", error);
-                alert("Error al iniciar sesión: " + error.message);
-            });
-        }
-
-        function signOut() {
-            auth.signOut().then(() => {
-                window.location.reload();
-            }).catch((error) => {
-                console.error("Error signing out:", error);
-            });
-        }
+        let lastLoadedRow = 0;
+        const POSTS_PER_PAGE = 5;
 
         // --- Modal Logic ---
         const modal = document.getElementById('newPostModal');
@@ -575,10 +509,8 @@
             document.getElementById('postTitle').value = '';
             document.getElementById('postContent').value = '';
             document.getElementById('postCategory').selectedIndex = 0;
-            if (!currentUser) {
-                document.getElementById('postName').value = '';
-                document.getElementById('postEmail').value = '';
-            }
+            document.getElementById('postName').value = '';
+            document.getElementById('postEmail').value = '';
         }
 
         function showMessage(msg, isError = false) {
@@ -588,7 +520,7 @@
             box.classList.remove('hidden');
         }
 
-        // --- Database Logic (Firestore) ---
+        // --- Database Logic (Supabase) ---
         async function submitPost() {
             const btn = document.getElementById('submitPostBtn');
             const originalContent = btn.innerHTML;
@@ -598,10 +530,13 @@
             const categorySelect = document.getElementById('postCategory');
             const category = categorySelect.options[categorySelect.selectedIndex].value;
 
-            let authorName = '';
-            let authorEmail = '';
-            let authorPhoto = '';
-            let authorId = null;
+            const authorName = document.getElementById('postName').value.trim();
+            const authorEmail = document.getElementById('postEmail').value.trim();
+
+            if (!authorName || !authorEmail) {
+                showMessage("Por favor, ingresa tu nombre y correo.", true);
+                return;
+            }
 
             // Validation
             if (!category || title === '' || content === '') {
@@ -609,20 +544,7 @@
                 return;
             }
 
-            if (currentUser) {
-                authorName = currentUser.displayName;
-                authorEmail = currentUser.email;
-                authorPhoto = currentUser.photoURL || `https://ui-avatars.com/api/?name=${authorName}&background=random`;
-                authorId = currentUser.uid;
-            } else {
-                authorName = document.getElementById('postName').value.trim();
-                authorEmail = document.getElementById('postEmail').value.trim();
-                authorPhoto = `https://ui-avatars.com/api/?name=${authorName}&background=random`;
-                if (!authorName || !authorEmail) {
-                    showMessage("Por favor, ingresa tu nombre y correo o inicia sesión.", true);
-                    return;
-                }
-            }
+            const authorPhoto = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
 
             // Loading state
             btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Publicando...`;
@@ -630,22 +552,24 @@
             btn.classList.add('opacity-75', 'cursor-not-allowed');
 
             try {
-                // Save to Firestore
+                // Save to Supabase
                 const postData = {
                     title: title,
                     content: content,
                     category: category,
-                    authorName: authorName,
-                    authorEmail: authorEmail,
-                    authorPhoto: authorPhoto,
-                    authorId: authorId,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    author_name: authorName,
+                    author_email: authorEmail,
+                    author_photo: authorPhoto,
                     likes: 0,
                     replies: 0,
                     resolved: false
                 };
 
-                await db.collection("consultas").add(postData);
+                const { data, error } = await supabase
+                    .from('consultas')
+                    .insert([postData]);
+
+                if (error) throw error;
 
                 showMessage("¡Consulta publicada con éxito! Recargando feed...");
 
@@ -660,7 +584,7 @@
 
             } catch (error) {
                 console.error("Error adding document: ", error);
-                showMessage("Error al publicar: " + error.message, true);
+                showMessage("Error al publicar: verifica la conexión a Supabase. (" + error.message + ")", true);
                 // Reset button
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
@@ -671,8 +595,9 @@
         // --- Feed Logic ---
 
         // Helper to format timestamps gracefully
-        function timeAgo(date) {
-            if (!date) return "Justo ahora";
+        function timeAgo(dateString) {
+            if (!dateString) return "Justo ahora";
+            const date = new Date(dateString);
             const seconds = Math.floor((new Date() - date) / 1000);
             let interval = seconds / 31536000;
             if (interval > 1) return Math.floor(interval) + " años";
@@ -690,10 +615,12 @@
         // Get color class for category
         function getCategoryColor(cat) {
             switch (cat) {
-                case 'Gramática': return 'blue';
-                case 'Vocabulario': return 'green';
-                case 'Pronunciación': return 'purple';
-                case 'Dudas Generales': return 'orange';
+                case 'Acceso y cuenta': return 'blue';
+                case 'Formación': return 'green';
+                case 'Comunidad': return 'purple';
+                case 'Recursos': return 'yellow';
+                case 'Problemas técnicos': return 'red';
+                case 'Método y Estudio': return 'orange';
                 default: return 'gray';
             }
         }
@@ -713,9 +640,14 @@
             countSpan.textContent = currentLikes + 1;
 
             try {
-                await db.collection('consultas').doc(postId).update({
-                    likes: firebase.firestore.FieldValue.increment(1)
-                });
+                // To safely increment in Supabase without RPC, you either use a stored procedure RPC('increment_likes')
+                // or just do an update, but for this demo an update by adding 1 is sufficient.
+                const { data, error } = await supabase
+                    .from('consultas')
+                    .update({ likes: currentLikes + 1 })
+                    .eq('id', postId);
+
+                if (error) throw error;
             } catch (error) {
                 console.error("Error liking post:", error);
                 // Revert UI on error
@@ -726,9 +658,9 @@
             }
         }
 
-        function createPostHTML(post, id) {
+        function createPostHTML(post) {
             const color = getCategoryColor(post.category);
-            const date = post.createdAt ? post.createdAt.toDate() : new Date();
+            const date = post.created_at || new Date();
 
             const resolvedBadge = post.resolved ? `
                 <div class="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
@@ -740,9 +672,9 @@
                 <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-3">
-                            <img src="${post.authorPhoto}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${post.authorName}&background=random'">
+                            <img src="${post.author_photo}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${post.author_name}&background=random'">
                             <div>
-                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">${post.authorName}</h4>
+                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">${post.author_name}</h4>
                                 <div class="text-xs text-gray-500 flex items-center gap-1">
                                     <span>${timeAgo(date)}</span>
                                     <span>&bull;</span>
@@ -761,7 +693,7 @@
                     
                     <div class="flex items-center justify-between pt-4 border-t border-gray-50">
                         <div class="flex items-center gap-6">
-                            <button id="like-btn-${id}" onclick="likePost('${id}', ${post.likes || 0}, event)" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors ${post.likes === 0 ? 'bg-gray-50 px-3 py-1 rounded-full' : ''}">
+                            <button id="like-btn-${post.id}" onclick="likePost('${post.id}', ${post.likes || 0}, event)" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors ${post.likes === 0 ? 'bg-gray-50 px-3 py-1 rounded-full' : ''}">
                                 <i class="ph ph-heart text-lg"></i>
                                 <span>${post.likes > 0 ? post.likes : 'Apoyar duda'}</span>
                             </button>
@@ -786,33 +718,32 @@
                 container.classList.add('hidden');
                 spinner.classList.remove('hidden');
                 loadBtn.classList.add('hidden');
+                lastLoadedRow = 0;
             }
 
             try {
-                let query = db.collection('consultas');
+                let query = supabase.from('consultas').select('*');
 
                 if (currentCategoryFilter) {
-                    query = query.where('category', '==', currentCategoryFilter);
+                    query = query.eq('category', currentCategoryFilter);
                 }
 
                 // Sorting
                 if (sortVal === 'likes') {
-                    query = query.orderBy('likes', 'desc').orderBy('createdAt', 'desc');
+                    query = query.order('likes', { ascending: false }).order('created_at', { ascending: false });
                 } else if (sortVal === 'asc') {
-                    query = query.orderBy('createdAt', 'asc');
+                    query = query.order('created_at', { ascending: true });
                 } else {
-                    query = query.orderBy('createdAt', 'desc');
+                    query = query.order('created_at', { ascending: false });
                 }
 
-                query = query.limit(5);
+                query = query.range(lastLoadedRow, lastLoadedRow + POSTS_PER_PAGE - 1);
 
-                if (isAppend && lastVisibleDoc) {
-                    query = query.startAfter(lastVisibleDoc);
-                }
+                const { data, error } = await query;
 
-                const snapshot = await query.get();
+                if (error) throw error;
 
-                if (snapshot.empty && !isAppend) {
+                if ((!data || data.length === 0) && !isAppend) {
                     container.innerHTML = `
                         <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed">
                             <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -823,10 +754,10 @@
                             <button onclick="openModal()" class="text-brand-600 font-medium hover:underline">Abrir consulta</button>
                         </div>
                     `;
-                } else {
+                } else if (data && data.length > 0) {
                     let html = '';
-                    snapshot.forEach(doc => {
-                        html += createPostHTML(doc.data(), doc.id);
+                    data.forEach(post => {
+                        html += createPostHTML(post);
                     });
 
                     if (isAppend) {
@@ -835,26 +766,28 @@
                         container.innerHTML = html;
                     }
 
-                    lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+                    lastLoadedRow += data.length;
 
                     // Show Load More if we got a full batch
-                    if (snapshot.docs.length === 5) {
+                    if (data.length === POSTS_PER_PAGE) {
                         loadBtn.classList.remove('hidden');
                     } else {
                         loadBtn.classList.add('hidden');
                     }
+                } else {
+                    loadBtn.classList.add('hidden');
                 }
 
                 spinner.classList.add('hidden');
                 container.classList.remove('hidden');
 
-                // Also update category counts opportunistically (in a real app, use aggregation queries)
+                // Also update category counts opportunistically
                 updateCategoryCounts();
 
             } catch (e) {
                 console.error("Error loading feed:", e);
                 spinner.classList.add('hidden');
-                container.innerHTML = `<p class="text-red-500 text-center py-8">Error al cargar las consultas. Verifica tu conexión.</p>`;
+                container.innerHTML = `<p class="text-red-500 text-center py-8">Error al cargar las consultas. Verifica tu conexión a Supabase.</p>`;
                 container.classList.remove('hidden');
             }
         }
@@ -880,13 +813,18 @@
 
         // Just to populate initial counters dynamically
         async function updateCategoryCounts() {
-            // Basic fetch just to get some counts for the UI aesthetics without doing complex aggregations
-            ['Gramática', 'Vocabulario', 'Pronunciación', 'Dudas Generales'].forEach(cat => {
-                db.collection('consultas').where('category', '==', cat).limit(100).get().then(snap => {
+            const categories = ['Acceso y cuenta', 'Formación', 'Comunidad', 'Recursos', 'Problemas técnicos', 'Método y Estudio'];
+            for (const cat of categories) {
+                const { count, error } = await supabase
+                    .from('consultas')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('category', cat);
+
+                if (!error) {
                     const el = document.querySelector(`.cat-count[data-cat="${cat}"]`);
-                    if (el) el.textContent = snap.size;
-                }).catch(e => console.log(e));
-            });
+                    if (el) el.textContent = count || 0;
+                }
+            }
         }
 
         // Initialize Feed
