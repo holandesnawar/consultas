@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -39,18 +45,21 @@
             background-color: #f8fafc;
             color: #0f172a;
         }
-        
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
@@ -59,10 +68,10 @@
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;  
+            -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
+
         /* Smooth transitions */
         .transition-all {
             transition-property: all;
@@ -76,11 +85,13 @@
             color: #2563eb;
             font-weight: 500;
         }
+
         .nav-link.active i {
             color: #2563eb;
         }
     </style>
 </head>
+
 <body class="antialiased min-h-screen flex flex-col">
 
     <!-- Top Navigation -->
@@ -89,28 +100,60 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/30">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/30">
                         H
                     </div>
                     <span class="font-bold tracking-tight text-gray-900 text-lg">Holandés Nawar</span>
                 </div>
-                
+
                 <!-- Search (Desktop) -->
                 <div class="hidden md:flex flex-1 max-w-lg mx-8 relative group">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="ph ph-magnifying-glass text-gray-400 group-focus-within:text-brand-600 transition-colors"></i>
+                        <i
+                            class="ph ph-magnifying-glass text-gray-400 group-focus-within:text-brand-600 transition-colors"></i>
                     </div>
-                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-full leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all sm:text-sm" placeholder="Busca preguntas, dudas, gramática...">
+                    <input type="text" id="searchInput"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-full leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all sm:text-sm"
+                        placeholder="Busca preguntas, dudas, gramática...">
                 </div>
 
                 <!-- Right Actions -->
                 <div class="flex items-center gap-4">
-                    <button class="text-gray-400 hover:text-gray-600 transition-colors relative">
-                        <i class="ph ph-bell text-2xl"></i>
-                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    <!-- Guest View (Login Button) -->
+                    <button id="loginBtn" onclick="signInWithGoogle()"
+                        class="hidden text-sm font-medium text-gray-700 hover:text-brand-600 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-xl transition-colors shadow-sm flex items-center gap-2">
+                        <img src="https://www.google.com/favicon.ico" class="w-4 h-4" alt="Google">
+                        Iniciar Sesión
                     </button>
-                    <div class="w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 overflow-hidden cursor-pointer border border-gray-200">
-                        <img src="https://ui-avatars.com/api/?name=Alumno&background=f1f5f9&color=475569" alt="User Avatar" class="w-full h-full object-cover">
+
+                    <!-- Authenticated View -->
+                    <div id="userProfile" class="hidden flex items-center gap-4">
+                        <button class="text-gray-400 hover:text-gray-600 transition-colors relative">
+                            <i class="ph ph-bell text-2xl"></i>
+                            <span
+                                class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        </button>
+                        <div class="relative group cursor-pointer">
+                            <div
+                                class="w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 overflow-hidden border border-gray-200">
+                                <img id="userAvatar" src="" alt="User Avatar" class="w-full h-full object-cover">
+                            </div>
+                            <!-- Dropdown -->
+                            <div
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="px-4 py-3 border-b border-gray-50">
+                                    <p class="text-sm font-medium text-gray-900 truncate" id="userNameDisplay"></p>
+                                    <p class="text-xs text-gray-500 truncate" id="userEmailDisplay"></p>
+                                </div>
+                                <div class="py-1">
+                                    <button onclick="signOut()"
+                                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
+                                        <i class="ph ph-sign-out"></i> Cerrar Sesión
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,13 +162,14 @@
 
     <!-- Main Layout -->
     <div class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
-        
+
         <!-- Left Sidebar (Navigation) -->
         <aside class="w-full md:w-64 flex-shrink-0 hidden md:block">
             <div class="sticky top-24 space-y-8">
-                
+
                 <!-- Main CTA -->
-                <button onclick="openModal()" class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all transform hover:-translate-y-0.5">
+                <button onclick="openModal()"
+                    class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all transform hover:-translate-y-0.5">
                     <i class="ph cursor-text ph-pencil-simple text-lg"></i>
                     Nueva Consulta
                 </button>
@@ -134,15 +178,18 @@
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Comunidad</h3>
                     <div class="space-y-1">
-                        <a href="#" class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-house text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Todo el Feed
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-fire text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Populares
                         </a>
-                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-bookmark-simple text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Mis Consultas
                         </a>
@@ -152,33 +199,49 @@
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Categorías</h3>
                     <div class="space-y-1">
-                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
+                            onclick="filterCategory('Gramática')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-blue-400"></span>
                                 Gramática
                             </div>
-                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">42</span>
+                            <span
+                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
+                                data-cat="Gramática">0</span>
                         </a>
-                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
+                            onclick="filterCategory('Vocabulario')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-green-400"></span>
                                 Vocabulario
                             </div>
-                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">18</span>
+                            <span
+                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
+                                data-cat="Vocabulario">0</span>
                         </a>
-                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
+                            onclick="filterCategory('Pronunciación')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-purple-400"></span>
                                 Pronunciación
                             </div>
-                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">7</span>
+                            <span
+                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
+                                data-cat="Pronunciación">0</span>
                         </a>
-                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                        <a href="#"
+                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
+                            onclick="filterCategory('Dudas Generales')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-orange-400"></span>
                                 Dudas Generales
                             </div>
-                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">124</span>
+                            <span
+                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
+                                data-cat="Dudas Generales">0</span>
                         </a>
                     </div>
                 </div>
@@ -190,161 +253,34 @@
             <!-- Feed Header & Filters -->
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
                 <h1 class="text-2xl font-bold tracking-tight text-gray-900">Todo el Feed</h1>
-                
+
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2 text-sm">
                         <span class="text-gray-500">Ordenar por:</span>
-                        <select class="bg-transparent font-medium text-gray-900 focus:outline-none focus:ring-0 cursor-pointer">
-                            <option>Más recientes</option>
-                            <option>Más votados</option>
-                            <option>Sin responder</option>
+                        <select id="sortSelect" onchange="loadFeed()"
+                            class="bg-transparent font-medium text-gray-900 focus:outline-none focus:ring-0 cursor-pointer">
+                            <option value="desc">Más recientes</option>
+                            <option value="asc">Más antiguas</option>
+                            <option value="likes">Más votados</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- Posts List -->
-            <div class="space-y-4">
-                
-                <!-- Post Card 1 (Resolved) -->
-                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
-                    <!-- Author & Metada -->
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Carlos+M&background=random" class="w-10 h-10 rounded-full" alt="Avatar">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">Carlos Martín</h4>
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
-                                    <span>Hace 2 horas</span>
-                                    <span>&bull;</span>
-                                    <span class="inline-flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                        Gramática
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
-                            <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelto
-                        </div>
-                    </div>
-                    
-                    <!-- Content -->
-                    <h2 class="text-lg font-bold text-gray-900 mb-2">¿Cuál es la diferencia entre 'De' y 'Het' cuando hablamos de animales diminutivos?</h2>
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed">
-                        Tengo claro que los diminutivos siempre llevan "Het", pero cuando hablamos de un grupo de animales diminutivos en plural, me confunde si debe cambiar a "De" o mantenerse en "Het". Por ejemplo, het hondje vs de hondjes...
-                    </p>
-                    
-                    <!-- Engagement Footer -->
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
-                        <div class="flex items-center gap-6">
-                            <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors">
-                                <i class="ph ph-heart text-lg"></i>
-                                <span>12</span>
-                            </button>
-                            <button class="flex items-center gap-1.5 text-sm text-brand-600 font-medium transition-colors">
-                                <i class="ph-fill ph-chat-circle text-lg"></i>
-                                <span>3 respuestas</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Mini Avatars of repliers -->
-                        <div class="flex -space-x-2">
-                            <img class="w-6 h-6 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=Nawar&background=2563eb&color=fff" alt="">
-                            <img class="w-6 h-6 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=Sara+L&background=random" alt="">
-                        </div>
-                    </div>
-                </article>
+            <!-- Loading Spinner -->
+            <div id="loadingFeed" class="flex justify-center items-center py-12">
+                <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-500"></i>
+            </div>
 
-                <!-- Post Card 2 (Unresolved) -->
-                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Laura+G&background=random" class="w-10 h-10 rounded-full" alt="Avatar">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">Laura García</h4>
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
-                                    <span>Hace 5 horas</span>
-                                    <span>&bull;</span>
-                                    <span class="inline-flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                        Pronunciación
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- No badge if open -->
-                    </div>
-                    
-                    <h2 class="text-lg font-bold text-gray-900 mb-2">Ayuda con los diptongos 'ui' y 'eu'</h2>
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed">
-                        Me sigue costando mucho diferenciar estos dos sonidos cuando los escucho. ¿Alguien tiene algún truco o palabras de referencia concretas para practicar el "ui" (como en huis) vs el "eu" (como en leuk)?
-                    </p>
-                    
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
-                        <div class="flex items-center gap-6">
-                            <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors bg-gray-50 px-3 py-1 rounded-full">
-                                <i class="ph ph-heart text-lg"></i>
-                                <span>Apoyar duda</span>
-                            </button>
-                            <button class="flex items-center gap-1.5 text-sm text-gray-500 transition-colors">
-                                <i class="ph ph-chat-circle text-lg"></i>
-                                <span>Sé el primero en responder</span>
-                            </button>
-                        </div>
-                    </div>
-                </article>
-
-                 <!-- Post Card 3 (Official Post/Announcement) -->
-                 <article class="bg-gradient-to-br from-brand-50 to-white rounded-2xl p-5 shadow-soft border border-brand-100 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-bl-full"></div>
-                    
-                    <div class="flex items-center justify-between mb-3 relative">
-                        <div class="flex items-center gap-3">
-                            <div class="relative">
-                                <img src="https://ui-avatars.com/api/?name=Profesor+Nawar&background=2563eb&color=fff" class="w-10 h-10 rounded-full ring-2 ring-brand-100" alt="Avatar">
-                                <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
-                                    <i class="ph-fill ph-check-circle text-brand-600 text-sm"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">Equipo Holandés Nawar</h4>
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
-                                    <span>Ayer</span>
-                                    <span>&bull;</span>
-                                    <span class="inline-flex items-center gap-1 text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide">
-                                        <i class="ph-fill ph-push-pin text-[10px]"></i>
-                                        Anuncio
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <h2 class="text-lg font-bold text-gray-900 mb-2 relative">Cómo sacarle el máximo partido a esta sección de consultas</h2>
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed relative">
-                        ¡Bienvenidos al nuevo portal comunitario! Antes de abrir una consulta, te recomendamos usar el buscador de arriba. Hemos categorizado todo para que sea mucho más fácil encontrar respuestas instantáneas...
-                    </p>
-                    
-                    <div class="flex items-center justify-between pt-4 border-t border-brand-100/50 relative">
-                        <div class="flex items-center gap-6">
-                            <button class="flex items-center gap-1.5 text-sm text-brand-600 font-medium transition-colors">
-                                <i class="ph-fill ph-heart text-lg"></i>
-                                <span>45</span>
-                            </button>
-                            <button class="flex items-center gap-1.5 text-sm text-gray-600 font-medium transition-colors">
-                                <i class="ph ph-chat-circle text-lg"></i>
-                                <span>12 comentarios</span>
-                            </button>
-                        </div>
-                    </div>
-                </article>
-
+            <!-- Posts List (Dynamic Container) -->
+            <div id="feedContainer" class="space-y-4 hidden">
+                <!-- Posts will be injected here via JavaScript -->
             </div>
 
             <!-- Pagination / Load More -->
-            <div class="mt-8 flex justify-center">
-                <button class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm text-sm">
+            <div id="loadMoreContainer" class="mt-8 flex justify-center hidden">
+                <button onclick="loadMore()"
+                    class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm text-sm">
                     Cargar más consultas
                 </button>
             </div>
@@ -352,16 +288,18 @@
 
         <!-- Right Sidebar (Extra Context & Leaderboard) -->
         <aside class="w-full md:w-72 flex-shrink-0 hidden lg:block space-y-6">
-            
+
             <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
                 <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
                     <i class="ph-fill ph-info text-brand-500 text-xl"></i>
                     Sobre las Consultas
                 </h3>
                 <p class="text-sm text-gray-600 leading-relaxed mb-4">
-                    Este es tu espacio para resolver dudas sobre el idioma. Nuestro equipo y otros alumnos avanzados te ayudarán lo antes posible.
+                    Este es tu espacio para resolver dudas sobre el idioma. Nuestro equipo y otros alumnos avanzados te
+                    ayudarán lo antes posible.
                 </p>
-                <div class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800 font-medium border border-brand-100 flex items-start gap-2">
+                <div
+                    class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800 font-medium border border-brand-100 flex items-start gap-2">
                     <i class="ph-fill ph-lightbulb mt-0.5"></i>
                     <div>Recuerda buscar primero, ¡tu duda podría estar ya resuelta!</div>
                 </div>
@@ -374,15 +312,21 @@
                 </h3>
                 <div class="space-y-3">
                     <a href="#" class="block group">
-                        <div class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">Inversión del sujeto en frases subordinadas</div>
+                        <div
+                            class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">
+                            Inversión del sujeto en frases subordinadas</div>
                         <div class="text-xs text-gray-400 mt-0.5">14 personas discutiendo</div>
                     </a>
                     <a href="#" class="block group">
-                        <div class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">Uso de 'Er' resumido</div>
+                        <div
+                            class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">
+                            Uso de 'Er' resumido</div>
                         <div class="text-xs text-gray-400 mt-0.5">8 personas discutiendo</div>
                     </a>
                     <a href="#" class="block group">
-                        <div class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">Verbos separables comunes</div>
+                        <div
+                            class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">
+                            Verbos separables comunes</div>
                         <div class="text-xs text-gray-400 mt-0.5">5 personas discutiendo</div>
                     </a>
                 </div>
@@ -391,18 +335,21 @@
             <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
                 <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
                     <i class="ph-fill ph-medal text-yellow-500 text-xl"></i>
-                    Colaboradores <span class="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded ml-1 tracking-wider uppercase">Top</span>
+                    Colaboradores <span
+                        class="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded ml-1 tracking-wider uppercase">Top</span>
                 </h3>
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
-                        <img src="https://ui-avatars.com/api/?name=Marta+V&background=fce7f3" class="w-8 h-8 rounded-full" alt="Marta">
+                        <img src="https://ui-avatars.com/api/?name=Marta+V&background=fce7f3"
+                            class="w-8 h-8 rounded-full" alt="Marta">
                         <div class="flex-1">
                             <div class="text-sm font-medium text-gray-900">Marta V.</div>
                             <div class="text-xs text-brand-600">32 respuestas</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <img src="https://ui-avatars.com/api/?name=Alejandro&background=dcfce7" class="w-8 h-8 rounded-full" alt="Alex">
+                        <img src="https://ui-avatars.com/api/?name=Alejandro&background=dcfce7"
+                            class="w-8 h-8 rounded-full" alt="Alex">
                         <div class="flex-1">
                             <div class="text-sm font-medium text-gray-900">Alejandro P.</div>
                             <div class="text-xs text-brand-600">28 respuestas</div>
@@ -410,39 +357,58 @@
                     </div>
                 </div>
             </div>
-            
+
         </aside>
 
     </div>
 
     <!-- New Consultation Modal Overlay -->
-    <div id="newPostModal" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div id="newPostModal"
+        class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
-        
+
         <!-- Modal Content -->
-        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300" id="modalContainer">
-            
+        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300"
+            id="modalContainer">
+
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
                 <h2 class="text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                <button onclick="closeModal()"
+                    class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
                     <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
 
             <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-gray-50/50">
-                
+
+                <!-- Guest User Info Fields (Only shown if not logged in) -->
+                <div id="guestFields" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tu Nombre</label>
+                        <input type="text" id="postName" placeholder="Ej: Carlos"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tu Correo Electrónico</label>
+                        <input type="email" id="postEmail" placeholder="Para notificarte la respuesta"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
                     <div class="relative">
-                        <select class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
+                        <select id="postCategory"
+                            class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
                             <option value="" disabled selected>Selecciona un tema...</option>
-                            <option>Gramática</option>
-                            <option>Vocabulario</option>
-                            <option>Pronunciación</option>
-                            <option>Dudas Generales</option>
+                            <option value="Gramática">Gramática</option>
+                            <option value="Vocabulario">Vocabulario</option>
+                            <option value="Pronunciación">Pronunciación</option>
+                            <option value="Dudas Generales">Dudas Generales</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
                             <i class="ph ph-caret-down"></i>
                         </div>
                     </div>
@@ -450,67 +416,485 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Título de tu consulta</label>
-                    <input type="text" placeholder="Sé específico (ej: ¿Cómo uso el verbo 'zullen'?)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
+                    <input type="text" id="postTitle" placeholder="Sé específico (ej: ¿Cómo uso el verbo 'zullen'?)"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Detalles de tu duda</label>
-                    
+
                     <!-- Fake Rich Text Toolbar -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
+                    <div
+                        class="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
                         <div class="flex items-center gap-1 bg-gray-50 border-b border-gray-200 px-3 py-2">
-                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-b"></i></button>
-                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-italic"></i></button>
-                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-link"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
+                                    class="ph ph-text-b"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
+                                    class="ph ph-text-italic"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
+                                    class="ph ph-link"></i></button>
                             <div class="w-px h-4 bg-gray-300 mx-1"></div>
-                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-numbers"></i></button>
-                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-bullets"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
+                                    class="ph ph-list-numbers"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
+                                    class="ph ph-list-bullets"></i></button>
                             <div class="w-px h-4 bg-gray-300 mx-1"></div>
-                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-image"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
+                                    class="ph ph-image"></i></button>
                         </div>
-                        <textarea rows="6" placeholder="Explica tu duda con el mayor detalle posible para que podamos ayudarte mejor..." class="w-full px-4 py-3 text-gray-900 focus:outline-none resize-none bg-white font-normal"></textarea>
+                        <textarea id="postContent" rows="6"
+                            placeholder="Explica tu duda con el mayor detalle posible para que podamos ayudarte mejor..."
+                            class="w-full px-4 py-3 text-gray-900 focus:outline-none resize-none bg-white font-normal"></textarea>
                     </div>
                 </div>
 
             </div>
 
+            <!-- Error/Success Message Container -->
+            <div id="modalMessage" class="hidden px-6 py-2 text-sm font-medium"></div>
+
             <div class="p-6 border-t border-gray-100 bg-white rounded-b-2xl flex items-center justify-between">
-                <p class="text-xs text-gray-500">¿Duda urgente? Revisa primero los <a href="#" class="text-brand-600 hover:underline">tópics populares</a>.</p>
+                <p class="text-xs text-gray-500">¿Duda urgente? Revisa primero los <a href="#"
+                        class="text-brand-600 hover:underline">tópics populares</a>.</p>
                 <div class="flex gap-3">
-                    <button onclick="closeModal()" class="px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
-                    <button class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating hover:shadow-brand-500/25 transition-all flex items-center gap-2">
+                    <button onclick="closeModal()"
+                        class="px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
+                    <button id="submitPostBtn" onclick="submitPost()"
+                        class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating hover:shadow-brand-500/25 transition-all flex items-center gap-2">
                         <i class="ph ph-paper-plane-right"></i>
-                        Publicar Consulta
+                        <span>Publicar Consulta</span>
                     </button>
                 </div>
             </div>
-            
+
         </div>
     </div>
 
     <script>
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOd4Y1mscWdXMg2nE7BRCDC16HlkFbWq0",
+            authDomain: "plataforma-holandes-nawar.firebaseapp.com",
+            projectId: "plataforma-holandes-nawar", // Assuming project ID based on auth domain
+            storageBucket: "plataforma-holandes-nawar.appspot.com",
+            messagingSenderId: "539343735033",
+            appId: "1:539343735033:web:your_app_id_here", // Would need real app ID, but usually works without for basics
+            measurementId: "G-3Y5BBE07CP"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let currentUser = null;
+        let lastVisibleDoc = null;
+        let currentCategoryFilter = null;
+
+        // --- Authentication Logic ---
+        function updateAuthUI(user) {
+            const loginBtn = document.getElementById('loginBtn');
+            const userProfile = document.getElementById('userProfile');
+            const guestFields = document.getElementById('guestFields');
+            const postNameInput = document.getElementById('postName');
+            const postEmailInput = document.getElementById('postEmail');
+
+            if (user) {
+                // Logged in
+                loginBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                document.getElementById('userAvatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=f1f5f9&color=475569`;
+                document.getElementById('userNameDisplay').textContent = user.displayName;
+                document.getElementById('userEmailDisplay').textContent = user.email;
+
+                // Hide guest fields in modal, will auto-fill on submit
+                guestFields.classList.add('hidden');
+            } else {
+                // Logged out
+                loginBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                guestFields.classList.remove('hidden');
+            }
+        }
+
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            updateAuthUI(user);
+        });
+
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch((error) => {
+                console.error("Error signing in:", error);
+                alert("Error al iniciar sesión: " + error.message);
+            });
+        }
+
+        function signOut() {
+            auth.signOut().then(() => {
+                window.location.reload();
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+            });
+        }
+
+        // --- Modal Logic ---
         const modal = document.getElementById('newPostModal');
         const modalContainer = document.getElementById('modalContainer');
 
         function openModal() {
             modal.classList.remove('hidden');
-            // Trigger reflow for transition
-            void modal.offsetWidth;
+            void modal.offsetWidth; // trigger reflow
             modal.classList.remove('opacity-0');
             modalContainer.classList.remove('scale-95');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+
+            // clear previous messages
+            const msgBox = document.getElementById('modalMessage');
+            msgBox.classList.add('hidden');
+            msgBox.className = "hidden px-6 py-2 text-sm font-medium";
+            msgBox.innerHTML = "";
+
+            // Generate dummy official post if feed is empty initially to test the view
+            if (document.getElementById('feedContainer').children.length === 0) {
+                loadFeed();
+            }
         }
 
         function closeModal() {
             modal.classList.add('opacity-0');
             modalContainer.classList.add('scale-95');
-            
-            // Wait for transition to finish before hiding
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
             }, 300);
+
+            // Reset form
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postContent').value = '';
+            document.getElementById('postCategory').selectedIndex = 0;
+            if (!currentUser) {
+                document.getElementById('postName').value = '';
+                document.getElementById('postEmail').value = '';
+            }
         }
+
+        function showMessage(msg, isError = false) {
+            const box = document.getElementById('modalMessage');
+            box.innerHTML = msg;
+            box.className = `px-6 py-2 text-sm font-medium rounded-lg mb-4 mx-6 ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
+            box.classList.remove('hidden');
+        }
+
+        // --- Database Logic (Firestore) ---
+        async function submitPost() {
+            const btn = document.getElementById('submitPostBtn');
+            const originalContent = btn.innerHTML;
+
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            const categorySelect = document.getElementById('postCategory');
+            const category = categorySelect.options[categorySelect.selectedIndex].value;
+
+            let authorName = '';
+            let authorEmail = '';
+            let authorPhoto = '';
+            let authorId = null;
+
+            // Validation
+            if (!category || title === '' || content === '') {
+                showMessage("Por favor, rellena la categoría, título y detalles de tu duda.", true);
+                return;
+            }
+
+            if (currentUser) {
+                authorName = currentUser.displayName;
+                authorEmail = currentUser.email;
+                authorPhoto = currentUser.photoURL || `https://ui-avatars.com/api/?name=${authorName}&background=random`;
+                authorId = currentUser.uid;
+            } else {
+                authorName = document.getElementById('postName').value.trim();
+                authorEmail = document.getElementById('postEmail').value.trim();
+                authorPhoto = `https://ui-avatars.com/api/?name=${authorName}&background=random`;
+                if (!authorName || !authorEmail) {
+                    showMessage("Por favor, ingresa tu nombre y correo o inicia sesión.", true);
+                    return;
+                }
+            }
+
+            // Loading state
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Publicando...`;
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                // Save to Firestore
+                const postData = {
+                    title: title,
+                    content: content,
+                    category: category,
+                    authorName: authorName,
+                    authorEmail: authorEmail,
+                    authorPhoto: authorPhoto,
+                    authorId: authorId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: 0,
+                    replies: 0,
+                    resolved: false
+                };
+
+                await db.collection("consultas").add(postData);
+
+                showMessage("¡Consulta publicada con éxito! Recargando feed...");
+
+                setTimeout(() => {
+                    closeModal();
+                    loadFeed(); // Reload feed to show new post
+                    // Reset button
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, 1500);
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                showMessage("Error al publicar: " + error.message, true);
+                // Reset button
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        // --- Feed Logic ---
+
+        // Helper to format timestamps gracefully
+        function timeAgo(date) {
+            if (!date) return "Justo ahora";
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " años";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " meses";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " días";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " horas";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " min";
+            return "Hace unos instantes";
+        }
+
+        // Get color class for category
+        function getCategoryColor(cat) {
+            switch (cat) {
+                case 'Gramática': return 'blue';
+                case 'Vocabulario': return 'green';
+                case 'Pronunciación': return 'purple';
+                case 'Dudas Generales': return 'orange';
+                default: return 'gray';
+            }
+        }
+
+        async function likePost(postId, currentLikes, event) {
+            // Prevent event bubbling if the card itself is clicked
+            if (event) event.stopPropagation();
+
+            const btn = document.getElementById(`like-btn-${postId}`);
+            const icon = btn.querySelector('i');
+            const countSpan = btn.querySelector('span');
+
+            // Optimistic UI update
+            icon.classList.remove('ph');
+            icon.classList.add('ph-fill', 'text-red-500');
+            btn.classList.add('text-red-500');
+            countSpan.textContent = currentLikes + 1;
+
+            try {
+                await db.collection('consultas').doc(postId).update({
+                    likes: firebase.firestore.FieldValue.increment(1)
+                });
+            } catch (error) {
+                console.error("Error liking post:", error);
+                // Revert UI on error
+                icon.classList.remove('ph-fill', 'text-red-500');
+                icon.classList.add('ph');
+                btn.classList.remove('text-red-500');
+                countSpan.textContent = currentLikes;
+            }
+        }
+
+        function createPostHTML(post, id) {
+            const color = getCategoryColor(post.category);
+            const date = post.createdAt ? post.createdAt.toDate() : new Date();
+
+            const resolvedBadge = post.resolved ? `
+                <div class="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
+                    <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelto
+                </div>
+            ` : '';
+
+            return `
+                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <img src="${post.authorPhoto}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${post.authorName}&background=random'">
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">${post.authorName}</h4>
+                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                    <span>${timeAgo(date)}</span>
+                                    <span>&bull;</span>
+                                    <span class="inline-flex items-center gap-1 text-${color}-600 bg-${color}-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-${color}-500"></span>
+                                        ${post.category}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        ${resolvedBadge}
+                    </div>
+                    
+                    <h2 class="text-lg font-bold text-gray-900 mb-2">${post.title}</h2>
+                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed whitespace-pre-line">${post.content}</p>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                        <div class="flex items-center gap-6">
+                            <button id="like-btn-${id}" onclick="likePost('${id}', ${post.likes || 0}, event)" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors ${post.likes === 0 ? 'bg-gray-50 px-3 py-1 rounded-full' : ''}">
+                                <i class="ph ph-heart text-lg"></i>
+                                <span>${post.likes > 0 ? post.likes : 'Apoyar duda'}</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors">
+                                <i class="ph ph-chat-circle text-lg"></i>
+                                <span>${post.replies > 0 ? post.replies + ' respuestas' : 'Sé el primero en responder'}</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        async function loadFeed(isAppend = false) {
+            const container = document.getElementById('feedContainer');
+            const spinner = document.getElementById('loadingFeed');
+            const loadBtn = document.getElementById('loadMoreContainer');
+            const sortVal = document.getElementById('sortSelect').value;
+
+            if (!isAppend) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                loadBtn.classList.add('hidden');
+            }
+
+            try {
+                let query = db.collection('consultas');
+
+                if (currentCategoryFilter) {
+                    query = query.where('category', '==', currentCategoryFilter);
+                }
+
+                // Sorting
+                if (sortVal === 'likes') {
+                    query = query.orderBy('likes', 'desc').orderBy('createdAt', 'desc');
+                } else if (sortVal === 'asc') {
+                    query = query.orderBy('createdAt', 'asc');
+                } else {
+                    query = query.orderBy('createdAt', 'desc');
+                }
+
+                query = query.limit(5);
+
+                if (isAppend && lastVisibleDoc) {
+                    query = query.startAfter(lastVisibleDoc);
+                }
+
+                const snapshot = await query.get();
+
+                if (snapshot.empty && !isAppend) {
+                    container.innerHTML = `
+                        <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed">
+                            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="ph ph-empty text-3xl text-gray-400"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900">Aún no hay consultas</h3>
+                            <p class="text-gray-500 text-sm mt-1 mb-4">¡Sé el primero en abrir una duda!</p>
+                            <button onclick="openModal()" class="text-brand-600 font-medium hover:underline">Abrir consulta</button>
+                        </div>
+                    `;
+                } else {
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        html += createPostHTML(doc.data(), doc.id);
+                    });
+
+                    if (isAppend) {
+                        container.insertAdjacentHTML('beforeend', html);
+                    } else {
+                        container.innerHTML = html;
+                    }
+
+                    lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+
+                    // Show Load More if we got a full batch
+                    if (snapshot.docs.length === 5) {
+                        loadBtn.classList.remove('hidden');
+                    } else {
+                        loadBtn.classList.add('hidden');
+                    }
+                }
+
+                spinner.classList.add('hidden');
+                container.classList.remove('hidden');
+
+                // Also update category counts opportunistically (in a real app, use aggregation queries)
+                updateCategoryCounts();
+
+            } catch (e) {
+                console.error("Error loading feed:", e);
+                spinner.classList.add('hidden');
+                container.innerHTML = `<p class="text-red-500 text-center py-8">Error al cargar las consultas. Verifica tu conexión.</p>`;
+                container.classList.remove('hidden');
+            }
+        }
+
+        function loadMore() {
+            loadFeed(true);
+        }
+
+        function filterCategory(categoryName) {
+            currentCategoryFilter = categoryName;
+
+            // Update active state in sidebar
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const clickedLink = Array.from(document.querySelectorAll('.cat-count')).find(el => el.dataset.cat === categoryName)?.closest('a');
+            if (clickedLink) clickedLink.classList.add('active');
+
+            // Update Header Title
+            const headerTitle = document.querySelector('h1.tracking-tight');
+            if (headerTitle) headerTitle.textContent = categoryName ? `Consultas: ${categoryName}` : 'Todo el Feed';
+
+            loadFeed(false);
+        }
+
+        // Just to populate initial counters dynamically
+        async function updateCategoryCounts() {
+            // Basic fetch just to get some counts for the UI aesthetics without doing complex aggregations
+            ['Gramática', 'Vocabulario', 'Pronunciación', 'Dudas Generales'].forEach(cat => {
+                db.collection('consultas').where('category', '==', cat).limit(100).get().then(snap => {
+                    const el = document.querySelector(`.cat-count[data-cat="${cat}"]`);
+                    if (el) el.textContent = snap.size;
+                }).catch(e => console.log(e));
+            });
+        }
+
+        // Initialize Feed
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeed(false);
+        });
+
     </script>
 </body>
+
 </html>
