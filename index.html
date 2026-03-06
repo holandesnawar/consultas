@@ -137,69 +137,69 @@
                     <div class="space-y-1">
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Acceso y cuenta')">
+                            onclick="filterCategory('acceso')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-blue-400"></span>
                                 Acceso y cuenta
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Acceso y cuenta">0</span>
+                                data-cat="acceso">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Formación')">
+                            onclick="filterCategory('gramatica')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-green-400"></span>
-                                Formación
+                                Gramática
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Formación">0</span>
+                                data-cat="gramatica">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Comunidad')">
+                            onclick="filterCategory('comunidad')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-purple-400"></span>
                                 Comunidad
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Comunidad">0</span>
+                                data-cat="comunidad">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Recursos')">
+                            onclick="filterCategory('recursos')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
                                 Recursos
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Recursos">0</span>
+                                data-cat="recursos">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Problemas técnicos')">
+                            onclick="filterCategory('tecnico')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-red-400"></span>
                                 Problemas técnicos
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Problemas técnicos">0</span>
+                                data-cat="tecnico">0</span>
                         </a>
                         <a href="#"
                             class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('Método y Estudio')">
+                            onclick="filterCategory('metodo')">
                             <div class="flex items-center gap-3">
                                 <span class="w-3 h-3 rounded-full bg-orange-400"></span>
                                 Método y Estudio
                             </div>
                             <span
                                 class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="Método y Estudio">0</span>
+                                data-cat="metodo">0</span>
                         </a>
                     </div>
                 </div>
@@ -308,12 +308,12 @@
                         <select id="postCategory"
                             class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
                             <option value="" disabled selected>Selecciona un tema...</option>
-                            <option value="Acceso y cuenta">Acceso y cuenta</option>
-                            <option value="Formación">Formación</option>
-                            <option value="Comunidad">Comunidad</option>
-                            <option value="Recursos">Recursos</option>
-                            <option value="Problemas técnicos">Problemas técnicos</option>
-                            <option value="Método y Estudio">Método y Estudio</option>
+                            <option value="acceso">Acceso y cuenta</option>
+                            <option value="gramatica">Gramática</option>
+                            <option value="comunidad">Comunidad</option>
+                            <option value="recursos">Recursos</option>
+                            <option value="tecnico">Problemas técnicos</option>
+                            <option value="metodo">Método y Estudio</option>
                         </select>
                         <div
                             class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
@@ -530,13 +530,26 @@
         // Get color class for category
         function getCategoryColor(cat) {
             switch (cat) {
-                case 'Acceso y cuenta': return 'blue';
-                case 'Formación': return 'green';
-                case 'Comunidad': return 'purple';
-                case 'Recursos': return 'yellow';
-                case 'Problemas técnicos': return 'red';
-                case 'Método y Estudio': return 'orange';
+                case 'acceso': return 'blue';
+                case 'gramatica': return 'green';
+                case 'comunidad': return 'purple';
+                case 'recursos': return 'yellow';
+                case 'tecnico': return 'red';
+                case 'metodo': return 'orange';
                 default: return 'gray';
+            }
+        }
+
+        // Helper to localize category
+        function getCategoryName(cat) {
+            switch (cat) {
+                case 'acceso': return 'Acceso y cuenta';
+                case 'gramatica': return 'Gramática';
+                case 'comunidad': return 'Comunidad';
+                case 'recursos': return 'Recursos';
+                case 'tecnico': return 'Problemas técnicos';
+                case 'metodo': return 'Método y Estudio';
+                default: return cat;
             }
         }
 
@@ -568,7 +581,7 @@
                                     <span>&bull;</span>
                                     <span class="inline-flex items-center gap-1 text-${color}-600 bg-${color}-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
                                         <span class="w-1.5 h-1.5 rounded-full bg-${color}-500"></span>
-                                        ${category}
+                                        ${getCategoryName(category)}
                                     </span>
                                 </div>
                             </div>
@@ -696,14 +709,22 @@
 
             // Update Header Title
             const headerTitle = document.querySelector('h1.tracking-tight');
-            if (headerTitle) headerTitle.textContent = categoryName ? `Consultas: ${categoryName}` : 'Todo el Feed';
+            const categoriesMap = {
+                'acceso': 'Acceso y cuenta',
+                'gramatica': 'Gramática',
+                'comunidad': 'Comunidad',
+                'recursos': 'Recursos',
+                'tecnico': 'Problemas técnicos',
+                'metodo': 'Método y Estudio'
+            };
+            if (headerTitle) headerTitle.textContent = categoryName ? `Consultas: ${categoriesMap[categoryName]}` : 'Todo el Feed';
 
             loadFeed(false);
         }
 
         // Just to populate initial counters dynamically
         async function updateCategoryCounts() {
-            const categories = ['Acceso y cuenta', 'Formación', 'Comunidad', 'Recursos', 'Problemas técnicos', 'Método y Estudio'];
+            const categories = ['acceso', 'gramatica', 'comunidad', 'recursos', 'tecnico', 'metodo'];
             for (const cat of categories) {
                 const { count, error } = await supabase
                     .from('consultas')
@@ -711,7 +732,7 @@
                     .eq('category', cat);
 
                 if (!error) {
-                    const el = document.querySelector(`.cat-count[data-cat="${cat}"]`);
+                    const el = document.querySelector(`.cat - count[data - cat="${cat}"]`);
                     if (el) el.textContent = count || 0;
                 }
             }
