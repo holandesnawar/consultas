@@ -90,47 +90,19 @@
     </style>
 </head>
 
-<body class="antialiased min-h-screen flex flex-col">
+<body class="antialiased min-h-screen flex flex-col bg-transparent">
 
-    <!-- Top Navigation -->
-    <header class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center gap-3">
-                    <div
-                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/30">
-                        H
-                    </div>
-                    <span class="font-bold tracking-tight text-gray-900 text-lg">Holandés Nawar</span>
-                </div>
-
-                <!-- Search (Desktop) -->
-                <div class="hidden md:flex flex-1 max-w-lg mx-8 relative group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i
-                            class="ph ph-magnifying-glass text-gray-400 group-focus-within:text-brand-600 transition-colors"></i>
-                    </div>
-                    <input type="text" id="searchInput"
-                        class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-full leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all sm:text-sm"
-                        placeholder="Busca preguntas, dudas, gramática...">
-                </div>
-
-                <!-- Right Actions -->
-                <div class="flex items-center gap-4">
-                    <!-- Embedded View: Mobile CTA -->
-                    <button onclick="openModal()"
-                        class="md:hidden flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-3 sm:px-4 py-2 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all">
-                        <i class="ph ph-pencil-simple text-lg"></i>
-                        <span class="hidden sm:inline">Nueva</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
+    <div class="md:hidden p-4 pb-0">
+        <!-- Embedded View: Mobile CTA -->
+        <button onclick="openModal()"
+            class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all">
+            <i class="ph ph-pencil-simple text-lg"></i>
+            <span>Nueva Consulta</span>
+        </button>
+    </div>
 
     <!-- Main Layout -->
-    <div class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+    <div class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 flex flex-col md:flex-row gap-8">
 
         <!-- Left Sidebar (Navigation) -->
         <aside class="w-full md:w-64 flex-shrink-0 hidden md:block">
@@ -151,11 +123,6 @@
                             class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-house text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Todo el Feed
-                        </a>
-                        <a href="#"
-                            class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
-                            <i class="ph ph-fire text-lg text-gray-400 group-hover:text-gray-600"></i>
-                            Populares
                         </a>
                         <a href="#"
                             class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
@@ -252,7 +219,6 @@
                             class="bg-transparent font-medium text-gray-900 focus:outline-none focus:ring-0 cursor-pointer">
                             <option value="desc">Más recientes</option>
                             <option value="asc">Más antiguas</option>
-                            <option value="likes">Más votados</option>
                         </select>
                     </div>
                 </div>
@@ -296,58 +262,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
-                <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
-                    <i class="ph-fill ph-trend-up text-orange-500 text-xl"></i>
-                    Tópics Populares Hoy
-                </h3>
-                <div class="space-y-3">
-                    <a href="#" class="block group">
-                        <div
-                            class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">
-                            Inversión del sujeto en frases subordinadas</div>
-                        <div class="text-xs text-gray-400 mt-0.5">14 personas discutiendo</div>
-                    </a>
-                    <a href="#" class="block group">
-                        <div
-                            class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">
-                            Uso de 'Er' resumido</div>
-                        <div class="text-xs text-gray-400 mt-0.5">8 personas discutiendo</div>
-                    </a>
-                    <a href="#" class="block group">
-                        <div
-                            class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">
-                            Verbos separables comunes</div>
-                        <div class="text-xs text-gray-400 mt-0.5">5 personas discutiendo</div>
-                    </a>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
-                <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
-                    <i class="ph-fill ph-medal text-yellow-500 text-xl"></i>
-                    Colaboradores <span
-                        class="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded ml-1 tracking-wider uppercase">Top</span>
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <img src="https://ui-avatars.com/api/?name=Marta+V&background=fce7f3"
-                            class="w-8 h-8 rounded-full" alt="Marta">
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Marta V.</div>
-                            <div class="text-xs text-brand-600">32 respuestas</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <img src="https://ui-avatars.com/api/?name=Alejandro&background=dcfce7"
-                            class="w-8 h-8 rounded-full" alt="Alex">
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">Alejandro P.</div>
-                            <div class="text-xs text-brand-600">28 respuestas</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         </aside>
 
@@ -625,39 +540,6 @@
             }
         }
 
-        async function likePost(postId, currentLikes, event) {
-            // Prevent event bubbling if the card itself is clicked
-            if (event) event.stopPropagation();
-
-            const btn = document.getElementById(`like-btn-${postId}`);
-            const icon = btn.querySelector('i');
-            const countSpan = btn.querySelector('span');
-
-            // Optimistic UI update
-            icon.classList.remove('ph');
-            icon.classList.add('ph-fill', 'text-red-500');
-            btn.classList.add('text-red-500');
-            countSpan.textContent = currentLikes + 1;
-
-            try {
-                // To safely increment in Supabase without RPC, you either use a stored procedure RPC('increment_likes')
-                // or just do an update, but for this demo an update by adding 1 is sufficient.
-                const { data, error } = await supabase
-                    .from('consultas')
-                    .update({ likes: currentLikes + 1 })
-                    .eq('id', postId);
-
-                if (error) throw error;
-            } catch (error) {
-                console.error("Error liking post:", error);
-                // Revert UI on error
-                icon.classList.remove('ph-fill', 'text-red-500');
-                icon.classList.add('ph');
-                btn.classList.remove('text-red-500');
-                countSpan.textContent = currentLikes;
-            }
-        }
-
         function createPostHTML(post) {
             const category = post.category || 'Sin categoría';
             const color = getCategoryColor(category);
@@ -666,23 +548,21 @@
             const authorPhoto = post.author_photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
             const title = post.title || 'Sin título';
             const content = post.content || '';
-            const likes = post.likes || 0;
-            const replies = post.replies || 0;
             const id = post.id || Math.random().toString(36).substr(2, 9);
 
             const resolvedBadge = post.resolved ? `
-                <div class="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
+                <div class="flex flex-shrink-0 items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
                     <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelto
                 </div>
             ` : '';
 
             return `
-                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
-                    <div class="flex items-center justify-between mb-3">
+                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-200 transition-all group">
+                    <div class="flex items-start justify-between mb-3 gap-4">
                         <div class="flex items-center gap-3">
                             <img src="${authorPhoto}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random'">
                             <div>
-                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">${authorName}</h4>
+                                <h4 class="text-sm font-semibold text-gray-900">${authorName}</h4>
                                 <div class="text-xs text-gray-500 flex items-center gap-1">
                                     <span>${timeAgo(date)}</span>
                                     <span>&bull;</span>
@@ -697,20 +577,7 @@
                     </div>
                     
                     <h2 class="text-lg font-bold text-gray-900 mb-2">${title}</h2>
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed whitespace-pre-line">${content}</p>
-                    
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
-                        <div class="flex items-center gap-6">
-                            <button id="like-btn-${id}" onclick="likePost('${id}', ${likes}, event)" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors ${likes === 0 ? 'bg-gray-50 px-3 py-1 rounded-full' : ''}">
-                                <i class="ph ph-heart text-lg"></i>
-                                <span>${likes > 0 ? likes : 'Apoyar duda'}</span>
-                            </button>
-                            <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors">
-                                <i class="ph ph-chat-circle text-lg"></i>
-                                <span>${replies > 0 ? replies + ' respuestas' : 'Sé el primero en responder'}</span>
-                            </button>
-                        </div>
-                    </div>
+                    <p class="text-gray-600 text-sm mb-2 leading-relaxed whitespace-pre-line">${content}</p>
                 </article>
             `;
         }
@@ -737,10 +604,7 @@
                 }
 
                 // Sorting
-                if (sortVal === 'likes') {
-                    // Si 'likes' no existe en la base de datos, esto fallará y se atrapará en el catch
-                    query = query.order('likes', { ascending: false }).order('created_at', { ascending: false });
-                } else if (sortVal === 'asc') {
+                if (sortVal === 'asc') {
                     query = query.order('created_at', { ascending: true });
                 } else {
                     query = query.order('created_at', { ascending: false });
