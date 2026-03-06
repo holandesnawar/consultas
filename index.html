@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad - Holandés Nawar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 10px rgba(0, 0, 0, 0.02), 0 10px 25px rgba(0, 0, 0, 0.03)',
+                        'floating': '0 10px 40px -10px rgba(37, 99, 235, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Line clamp for text content */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        
+        /* Smooth transitions */
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+
+        /* Nav Link Active State */
+        .nav-link.active {
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-weight: 500;
+        }
+        .nav-link.active i {
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/30">
+                        H
+                    </div>
+                    <span class="font-bold tracking-tight text-gray-900 text-lg">Holandés Nawar</span>
+                </div>
+                
+                <!-- Search (Desktop) -->
+                <div class="hidden md:flex flex-1 max-w-lg mx-8 relative group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-gray-400 group-focus-within:text-brand-600 transition-colors"></i>
+                    </div>
+                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-full leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all sm:text-sm" placeholder="Busca preguntas, dudas, gramática...">
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-4">
+                    <button class="text-gray-400 hover:text-gray-600 transition-colors relative">
+                        <i class="ph ph-bell text-2xl"></i>
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 overflow-hidden cursor-pointer border border-gray-200">
+                        <img src="https://ui-avatars.com/api/?name=Alumno&background=f1f5f9&color=475569" alt="User Avatar" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+        
+        <!-- Left Sidebar (Navigation) -->
+        <aside class="w-full md:w-64 flex-shrink-0 hidden md:block">
+            <div class="sticky top-24 space-y-8">
+                
+                <!-- Main CTA -->
+                <button onclick="openModal()" class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all transform hover:-translate-y-0.5">
+                    <i class="ph cursor-text ph-pencil-simple text-lg"></i>
+                    Nueva Consulta
+                </button>
+
+                <!-- Navigation Sections -->
+                <div>
+                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Comunidad</h3>
+                    <div class="space-y-1">
+                        <a href="#" class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <i class="ph ph-house text-lg text-gray-400 group-hover:text-gray-600"></i>
+                            Todo el Feed
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <i class="ph ph-fire text-lg text-gray-400 group-hover:text-gray-600"></i>
+                            Populares
+                        </a>
+                        <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <i class="ph ph-bookmark-simple text-lg text-gray-400 group-hover:text-gray-600"></i>
+                            Mis Consultas
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Categorías</h3>
+                    <div class="space-y-1">
+                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-blue-400"></span>
+                                Gramática
+                            </div>
+                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">42</span>
+                        </a>
+                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-green-400"></span>
+                                Vocabulario
+                            </div>
+                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">18</span>
+                        </a>
+                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-purple-400"></span>
+                                Pronunciación
+                            </div>
+                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">7</span>
+                        </a>
+                        <a href="#" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-3 h-3 rounded-full bg-orange-400"></span>
+                                Dudas Generales
+                            </div>
+                            <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white">124</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Feed Content -->
+        <main class="flex-1 w-full max-w-3xl">
+            <!-- Feed Header & Filters -->
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900">Todo el Feed</h1>
+                
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-gray-500">Ordenar por:</span>
+                        <select class="bg-transparent font-medium text-gray-900 focus:outline-none focus:ring-0 cursor-pointer">
+                            <option>Más recientes</option>
+                            <option>Más votados</option>
+                            <option>Sin responder</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts List -->
+            <div class="space-y-4">
+                
+                <!-- Post Card 1 (Resolved) -->
+                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
+                    <!-- Author & Metada -->
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Carlos+M&background=random" class="w-10 h-10 rounded-full" alt="Avatar">
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">Carlos Martín</h4>
+                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                    <span>Hace 2 horas</span>
+                                    <span>&bull;</span>
+                                    <span class="inline-flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        Gramática
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
+                            <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelto
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <h2 class="text-lg font-bold text-gray-900 mb-2">¿Cuál es la diferencia entre 'De' y 'Het' cuando hablamos de animales diminutivos?</h2>
+                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed">
+                        Tengo claro que los diminutivos siempre llevan "Het", pero cuando hablamos de un grupo de animales diminutivos en plural, me confunde si debe cambiar a "De" o mantenerse en "Het". Por ejemplo, het hondje vs de hondjes...
+                    </p>
+                    
+                    <!-- Engagement Footer -->
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                        <div class="flex items-center gap-6">
+                            <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors">
+                                <i class="ph ph-heart text-lg"></i>
+                                <span>12</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 text-sm text-brand-600 font-medium transition-colors">
+                                <i class="ph-fill ph-chat-circle text-lg"></i>
+                                <span>3 respuestas</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Mini Avatars of repliers -->
+                        <div class="flex -space-x-2">
+                            <img class="w-6 h-6 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=Nawar&background=2563eb&color=fff" alt="">
+                            <img class="w-6 h-6 rounded-full border-2 border-white" src="https://ui-avatars.com/api/?name=Sara+L&background=random" alt="">
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post Card 2 (Unresolved) -->
+                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=Laura+G&background=random" class="w-10 h-10 rounded-full" alt="Avatar">
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">Laura García</h4>
+                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                    <span>Hace 5 horas</span>
+                                    <span>&bull;</span>
+                                    <span class="inline-flex items-center gap-1 text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                        Pronunciación
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- No badge if open -->
+                    </div>
+                    
+                    <h2 class="text-lg font-bold text-gray-900 mb-2">Ayuda con los diptongos 'ui' y 'eu'</h2>
+                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed">
+                        Me sigue costando mucho diferenciar estos dos sonidos cuando los escucho. ¿Alguien tiene algún truco o palabras de referencia concretas para practicar el "ui" (como en huis) vs el "eu" (como en leuk)?
+                    </p>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                        <div class="flex items-center gap-6">
+                            <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors bg-gray-50 px-3 py-1 rounded-full">
+                                <i class="ph ph-heart text-lg"></i>
+                                <span>Apoyar duda</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 text-sm text-gray-500 transition-colors">
+                                <i class="ph ph-chat-circle text-lg"></i>
+                                <span>Sé el primero en responder</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                 <!-- Post Card 3 (Official Post/Announcement) -->
+                 <article class="bg-gradient-to-br from-brand-50 to-white rounded-2xl p-5 shadow-soft border border-brand-100 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-bl-full"></div>
+                    
+                    <div class="flex items-center justify-between mb-3 relative">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <img src="https://ui-avatars.com/api/?name=Profesor+Nawar&background=2563eb&color=fff" class="w-10 h-10 rounded-full ring-2 ring-brand-100" alt="Avatar">
+                                <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                                    <i class="ph-fill ph-check-circle text-brand-600 text-sm"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">Equipo Holandés Nawar</h4>
+                                <div class="text-xs text-gray-500 flex items-center gap-1">
+                                    <span>Ayer</span>
+                                    <span>&bull;</span>
+                                    <span class="inline-flex items-center gap-1 text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide">
+                                        <i class="ph-fill ph-push-pin text-[10px]"></i>
+                                        Anuncio
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-lg font-bold text-gray-900 mb-2 relative">Cómo sacarle el máximo partido a esta sección de consultas</h2>
+                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed relative">
+                        ¡Bienvenidos al nuevo portal comunitario! Antes de abrir una consulta, te recomendamos usar el buscador de arriba. Hemos categorizado todo para que sea mucho más fácil encontrar respuestas instantáneas...
+                    </p>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-brand-100/50 relative">
+                        <div class="flex items-center gap-6">
+                            <button class="flex items-center gap-1.5 text-sm text-brand-600 font-medium transition-colors">
+                                <i class="ph-fill ph-heart text-lg"></i>
+                                <span>45</span>
+                            </button>
+                            <button class="flex items-center gap-1.5 text-sm text-gray-600 font-medium transition-colors">
+                                <i class="ph ph-chat-circle text-lg"></i>
+                                <span>12 comentarios</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- Pagination / Load More -->
+            <div class="mt-8 flex justify-center">
+                <button class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm text-sm">
+                    Cargar más consultas
+                </button>
+            </div>
+        </main>
+
+        <!-- Right Sidebar (Extra Context & Leaderboard) -->
+        <aside class="w-full md:w-72 flex-shrink-0 hidden lg:block space-y-6">
+            
+            <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
+                <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
+                    <i class="ph-fill ph-info text-brand-500 text-xl"></i>
+                    Sobre las Consultas
+                </h3>
+                <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                    Este es tu espacio para resolver dudas sobre el idioma. Nuestro equipo y otros alumnos avanzados te ayudarán lo antes posible.
+                </p>
+                <div class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800 font-medium border border-brand-100 flex items-start gap-2">
+                    <i class="ph-fill ph-lightbulb mt-0.5"></i>
+                    <div>Recuerda buscar primero, ¡tu duda podría estar ya resuelta!</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
+                <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
+                    <i class="ph-fill ph-trend-up text-orange-500 text-xl"></i>
+                    Tópics Populares Hoy
+                </h3>
+                <div class="space-y-3">
+                    <a href="#" class="block group">
+                        <div class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">Inversión del sujeto en frases subordinadas</div>
+                        <div class="text-xs text-gray-400 mt-0.5">14 personas discutiendo</div>
+                    </a>
+                    <a href="#" class="block group">
+                        <div class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">Uso de 'Er' resumido</div>
+                        <div class="text-xs text-gray-400 mt-0.5">8 personas discutiendo</div>
+                    </a>
+                    <a href="#" class="block group">
+                        <div class="text-sm font-medium text-gray-800 group-hover:text-brand-600 transition-colors line-clamp-1">Verbos separables comunes</div>
+                        <div class="text-xs text-gray-400 mt-0.5">5 personas discutiendo</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
+                <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
+                    <i class="ph-fill ph-medal text-yellow-500 text-xl"></i>
+                    Colaboradores <span class="bg-yellow-100 text-yellow-700 text-[10px] px-1.5 py-0.5 rounded ml-1 tracking-wider uppercase">Top</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=Marta+V&background=fce7f3" class="w-8 h-8 rounded-full" alt="Marta">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">Marta V.</div>
+                            <div class="text-xs text-brand-600">32 respuestas</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=Alejandro&background=dcfce7" class="w-8 h-8 rounded-full" alt="Alex">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">Alejandro P.</div>
+                            <div class="text-xs text-brand-600">28 respuestas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </aside>
+
+    </div>
+
+    <!-- New Consultation Modal Overlay -->
+    <div id="newPostModal" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300" id="modalContainer">
+            
+            <div class="flex items-center justify-between p-6 border-b border-gray-100">
+                <h2 class="text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-gray-50/50">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
+                    <div class="relative">
+                        <select class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
+                            <option value="" disabled selected>Selecciona un tema...</option>
+                            <option>Gramática</option>
+                            <option>Vocabulario</option>
+                            <option>Pronunciación</option>
+                            <option>Dudas Generales</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                            <i class="ph ph-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Título de tu consulta</label>
+                    <input type="text" placeholder="Sé específico (ej: ¿Cómo uso el verbo 'zullen'?)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Detalles de tu duda</label>
+                    
+                    <!-- Fake Rich Text Toolbar -->
+                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
+                        <div class="flex items-center gap-1 bg-gray-50 border-b border-gray-200 px-3 py-2">
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-b"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-italic"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-link"></i></button>
+                            <div class="w-px h-4 bg-gray-300 mx-1"></div>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-numbers"></i></button>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-bullets"></i></button>
+                            <div class="w-px h-4 bg-gray-300 mx-1"></div>
+                            <button class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-image"></i></button>
+                        </div>
+                        <textarea rows="6" placeholder="Explica tu duda con el mayor detalle posible para que podamos ayudarte mejor..." class="w-full px-4 py-3 text-gray-900 focus:outline-none resize-none bg-white font-normal"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-6 border-t border-gray-100 bg-white rounded-b-2xl flex items-center justify-between">
+                <p class="text-xs text-gray-500">¿Duda urgente? Revisa primero los <a href="#" class="text-brand-600 hover:underline">tópics populares</a>.</p>
+                <div class="flex gap-3">
+                    <button onclick="closeModal()" class="px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
+                    <button class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating hover:shadow-brand-500/25 transition-all flex items-center gap-2">
+                        <i class="ph ph-paper-plane-right"></i>
+                        Publicar Consulta
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('newPostModal');
+        const modalContainer = document.getElementById('modalContainer');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            // Trigger reflow for transition
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modalContainer.classList.remove('scale-95');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0');
+            modalContainer.classList.add('scale-95');
+            
+            // Wait for transition to finish before hiding
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
