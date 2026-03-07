@@ -472,11 +472,11 @@
                         alt="Avatar">
                     <div>
                         <h4 id="viewPostAuthor" class="text-base font-bold text-gray-900"></h4>
-                        <div class="text-xs text-gray-500 flex items-center gap-2">
-                            <span id="viewPostTime"></span>
-                            <span>&bull;</span>
+                        <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span id="viewPostTime" class="whitespace-nowrap"></span>
+                            <span class="hidden xs:block">&bull;</span>
                             <span id="viewPostCategory"
-                                class="font-medium uppercase tracking-wider text-brand-600"></span>
+                                class="font-medium uppercase tracking-wider text-brand-600 whitespace-nowrap"></span>
                         </div>
                     </div>
                 </div>
@@ -743,10 +743,10 @@
                             <img src="${authorPhoto}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random'">
                             <div>
                                 <h4 class="text-sm font-semibold text-gray-900">${authorName}</h4>
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
-                                    <span>${timeAgo(date)}</span>
-                                    <span>&bull;</span>
-                                    <span class="inline-flex items-center gap-1 text-${color}-600 bg-${color}-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                                <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span class="whitespace-nowrap">${timeAgo(date)}</span>
+                                    <span class="hidden xs:block">&bull;</span>
+                                    <span class="inline-flex items-center gap-1 text-${color}-600 bg-${color}-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide whitespace-nowrap">
                                         <span class="w-1.5 h-1.5 rounded-full bg-${color}-500"></span>
                                         ${getCategoryName(category)}
                                     </span>
