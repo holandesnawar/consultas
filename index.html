@@ -447,6 +447,83 @@
         </div>
     </div>
 
+    <!-- View Consultation Detail Modal Overlay -->
+    <div id="viewPostModal"
+        class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onclick="closeViewModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300 overflow-hidden"
+            id="viewModalContainer">
+
+            <div class="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
+                <div id="viewModalBadge"></div>
+                <button onclick="closeViewModal()"
+                    class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-white">
+                <!-- Header Info -->
+                <div class="flex items-center gap-4">
+                    <img id="viewPostAvatar" src="" class="w-12 h-12 rounded-full border-2 border-brand-100"
+                        alt="Avatar">
+                    <div>
+                        <h4 id="viewPostAuthor" class="text-base font-bold text-gray-900"></h4>
+                        <div class="text-xs text-gray-500 flex items-center gap-2">
+                            <span id="viewPostTime"></span>
+                            <span>&bull;</span>
+                            <span id="viewPostCategory"
+                                class="font-medium uppercase tracking-wider text-brand-600"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 id="viewPostTitle" class="text-2xl font-extrabold text-gray-900 leading-tight"></h2>
+                    <div id="viewPostContent"
+                        class="text-gray-700 text-base leading-relaxed post-content-display space-y-3 break-words">
+                    </div>
+                </div>
+
+                <!-- Admin Response Area -->
+                <div id="viewPostReply" class="hidden">
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <div class="bg-brand-50 rounded-2xl p-6 border border-brand-100 relative overflow-hidden group">
+                            <div
+                                class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i class="ph-fill ph-student text-6xl text-brand-600"></i>
+                            </div>
+                            <div class="relative">
+                                <h4 class="text-brand-900 font-bold flex items-center gap-2 mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center">
+                                        <i class="ph ph-student text-white text-lg"></i>
+                                    </div>
+                                    Equipo Nawar
+                                    <i class="ph-fill ph-seal-check text-brand-500 text-xs"
+                                        title="Respuesta Oficial"></i>
+                                </h4>
+                                <div id="viewReplyText"
+                                    class="text-gray-800 text-base leading-relaxed post-content-display space-y-3 break-words">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <button onclick="closeViewModal()"
+                    class="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-gray-800 transition-all active:scale-95">
+                    Cerrar Consulta
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
         // --- Supabase Configuration ---
         // INSTRUCCIÓN: Rellena estas dos variables con la URL y la Anon Key de tu proyecto Supabase.
@@ -655,29 +732,12 @@
                 `;
             }
 
-            // If the post has replies (e.g. from Equipo Nawar), we can show them in an expandable block
-            // Currently treating `post.respuesta_nawar` or similar as the reply content if it exists in DB.
-            const adminReply = post.respuesta_nawar || post.admin_reply || '';
-
-            const replyBlockHTML = adminReply ? `
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <div class="flex items-start gap-3 bg-brand-50/50 p-4 rounded-xl border border-brand-100">
-                        <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
-                            <i class="ph-fill ph-student text-brand-600 text-lg"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-brand-900 mb-1 flex items-center gap-1.5">
-                                Equipo Nawar 
-                                <i class="ph-fill ph-seal-check text-brand-500 text-[10px]" title="Respuesta Oficial"></i>
-                            </h4>
-                            <div class="text-gray-700 text-sm leading-relaxed post-content-display break-words">${adminReply}</div>
-                        </div>
-                    </div>
-                </div>
-            ` : '';
+            // Store post data in a global-ish way for the modal to access easily
+            // We'll use a data attribute or just pass it in onclick
+            const jsonPost = JSON.stringify(post).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
 
             return `
-                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-200 transition-all group md:cursor-pointer" onclick="toggleDetails(this)">
+                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-200 transition-all group md:cursor-pointer" onclick='openViewModal(${jsonPost})'>
                     <div class="flex items-start justify-between mb-3 gap-4">
                         <div class="flex items-center gap-3">
                             <img src="${authorPhoto}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random'">
@@ -697,31 +757,65 @@
                     </div>
                     
                     <h2 class="text-lg font-bold text-gray-900 mb-2">${title}</h2>
+                    <div class="text-gray-600 text-sm mb-2 leading-relaxed line-clamp-2">${content}</div>
                     
-                    <!-- Content Block (Hidden by default on mobile unless expanded, or keep visible. Let's make it expandable for better UX if they are long) -->
-                    <div class="post-details hidden md:block">
-                        <div class="text-gray-600 text-sm mb-2 leading-relaxed post-content-display break-words">${content}</div>
-                        ${replyBlockHTML}
-                    </div>
-                    
-                    <div class="post-expand-hint text-brand-600 text-sm font-medium mt-2 flex items-center gap-1 md:hidden">
-                        Leer más <i class="ph ph-caret-down"></i>
+                    <div class="text-brand-600 text-sm font-bold mt-3 flex items-center gap-1">
+                        Ver detalles <i class="ph ph-arrow-right"></i>
                     </div>
                 </article>
             `;
         }
 
-        function toggleDetails(element) {
-            const details = element.querySelector('.post-details');
-            const hint = element.querySelector('.post-expand-hint');
+        const viewModal = document.getElementById('viewPostModal');
+        const viewModalContainer = document.getElementById('viewModalContainer');
 
-            if (details.classList.contains('hidden')) {
-                details.classList.remove('hidden');
-                if (hint) hint.innerHTML = 'Mostrar menos <i class="ph ph-caret-up"></i>';
+        function openViewModal(post) {
+            document.getElementById('viewPostAvatar').src = post.author_photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author_name)}&background=random`;
+            document.getElementById('viewPostAuthor').textContent = post.author_name || 'Anónimo';
+            document.getElementById('viewPostTime').textContent = timeAgo(post.created_at);
+            document.getElementById('viewPostCategory').textContent = getCategoryName(post.category);
+            document.getElementById('viewPostTitle').textContent = post.title || 'Sin título';
+            document.getElementById('viewPostContent').innerHTML = post.content || '';
+
+            const isResolved = post.resolved === true || post.resolved === 'true';
+            const badgeBox = document.getElementById('viewModalBadge');
+            if (isResolved) {
+                badgeBox.innerHTML = `
+                    <div class="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full text-xs font-bold border border-green-100">
+                        <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Consulta Resuelta
+                    </div>
+                `;
             } else {
-                details.classList.add('hidden');
-                if (hint) hint.innerHTML = 'Leer más <i class="ph ph-caret-down"></i>';
+                badgeBox.innerHTML = `
+                    <div class="flex items-center text-amber-600 bg-amber-50 px-3 py-1 rounded-full text-xs font-bold border border-amber-100">
+                        <i class="ph-fill ph-clock mr-1 text-sm"></i> Consulta Pendiente
+                    </div>
+                `;
             }
+
+            const adminReply = post.respuesta_nawar || post.admin_reply || '';
+            const replySection = document.getElementById('viewPostReply');
+            if (adminReply) {
+                replySection.classList.remove('hidden');
+                document.getElementById('viewReplyText').innerHTML = adminReply;
+            } else {
+                replySection.classList.add('hidden');
+            }
+
+            viewModal.classList.remove('hidden');
+            void viewModal.offsetWidth;
+            viewModal.classList.remove('opacity-0');
+            viewModalContainer.classList.remove('scale-95');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeViewModal() {
+            viewModal.classList.add('opacity-0');
+            viewModalContainer.classList.add('scale-95');
+            setTimeout(() => {
+                viewModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
         }
 
         async function loadFeed(isAppend = false) {
