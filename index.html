@@ -4,65 +4,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunidad - Holandés Nawar</title>
+    <title>Consultas — Holandés Nawar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a',
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
                         }
                     },
                     boxShadow: {
-                        'soft': '0 2px 10px rgba(0, 0, 0, 0.02), 0 10px 25px rgba(0, 0, 0, 0.03)',
-                        'floating': '0 10px 40px -10px rgba(37, 99, 235, 0.15)',
+                        'soft': '0 2px 10px rgba(0,0,0,0.02), 0 10px 25px rgba(0,0,0,0.03)',
+                        'floating': '0 10px 40px -10px rgba(37,99,235,0.15)',
                     }
                 }
-            }
+            },
+            safelist: [
+                'bg-blue-400', 'bg-blue-500', 'bg-blue-50', 'text-blue-600',
+                'bg-green-400', 'bg-green-500', 'bg-green-50', 'text-green-600',
+                'bg-purple-400', 'bg-purple-500', 'bg-purple-50', 'text-purple-600',
+                'bg-yellow-400', 'bg-yellow-500', 'bg-yellow-50', 'text-yellow-600',
+                'bg-red-400', 'bg-red-500', 'bg-red-50', 'text-red-600',
+                'bg-orange-400', 'bg-orange-500', 'bg-orange-50', 'text-orange-600',
+            ]
         }
     </script>
     <style>
-        body {
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
+        body { background-color: #f8fafc; color: #0f172a; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* Line clamp for text content */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -70,35 +55,25 @@
             overflow: hidden;
         }
 
-        /* Smooth transitions */
         .transition-all {
             transition-property: all;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-duration: 200ms;
         }
 
-        /* Nav Link Active State */
         .nav-link.active {
             background-color: #eff6ff;
             color: #2563eb;
             font-weight: 500;
         }
+        .nav-link.active i { color: #2563eb; }
 
-        .nav-link.active i {
-            color: #2563eb;
-        }
-
-        /* Hide scrollbar for mobile nav */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
 
-        /* Fake Placeholder for contenteditable */
         [contenteditable][placeholder]:empty:before {
             content: attr(placeholder);
             color: #9ca3af;
@@ -106,185 +81,169 @@
             display: block;
         }
 
-        /* Rich Text Formatting */
-        #postContent ul,
-        .post-content-display ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
+        #postContent ul, .post-content-display ul {
+            list-style-type: disc; padding-left: 1.5rem;
+            margin-top: 0.5rem; margin-bottom: 0.5rem;
+        }
+        #postContent ol, .post-content-display ol {
+            list-style-type: decimal; padding-left: 1.5rem;
+            margin-top: 0.5rem; margin-bottom: 0.5rem;
+        }
+        .post-content-display b, .post-content-display strong { font-weight: bold; }
+        .post-content-display i, .post-content-display em { font-style: italic; }
+        .post-content-display u { text-decoration: underline; }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 40px, #f1f5f9 80px);
+            background-size: 1000px 100%;
+            animation: shimmer 1.6s infinite linear;
+            border-radius: 8px;
         }
 
-        #postContent ol,
-        .post-content-display ol {
-            list-style-type: decimal;
-            padding-left: 1.5rem;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .post-content-display b,
-        .post-content-display strong {
-            font-weight: bold;
-        }
-
-        .post-content-display i,
-        .post-content-display em {
-            font-style: italic;
-        }
-
-        .post-content-display u {
-            text-decoration: underline;
+        mark {
+            background-color: #fef3c7;
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 3px;
         }
     </style>
 </head>
 
 <body class="antialiased min-h-screen flex flex-col bg-transparent">
 
+    <!-- Mobile top bar -->
     <div class="md:hidden p-4 pb-0 w-full overflow-hidden">
-        <!-- Embedded View: Mobile CTA -->
-        <button onclick="openModal()"
-            class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all mb-4">
+        <button onclick="openModal()" aria-label="Abrir nueva consulta"
+            class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating transition-all mb-4">
             <i class="ph ph-pencil-simple text-lg"></i>
             <span>Nueva Consulta</span>
         </button>
-        <!-- Mobile Navigation -->
         <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide" id="mobileNav">
-            <button onclick="filterCategory(null, event)"
+            <button data-filter="all" onclick="filterCategory(null, event)"
                 class="mobile-nav-link active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
-            <button onclick="filterPending(event)"
+            <button data-filter="pending" onclick="filterPending(event)"
                 class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
-            <button onclick="filterCategory('acceso', event)"
+            <button data-filter="resolved" onclick="filterResolved(event)"
+                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
+            <button data-filter="acceso" onclick="filterCategory('acceso', event)"
                 class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Acceso</button>
-            <button onclick="filterCategory('gramatica', event)"
+            <button data-filter="gramatica" onclick="filterCategory('gramatica', event)"
                 class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Gramática</button>
-            <button onclick="filterCategory('comunidad', event)"
+            <button data-filter="comunidad" onclick="filterCategory('comunidad', event)"
                 class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Comunidad</button>
-            <button onclick="filterCategory('recursos', event)"
+            <button data-filter="recursos" onclick="filterCategory('recursos', event)"
                 class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Recursos</button>
-            <button onclick="filterCategory('tecnico', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Problemas</button>
-            <button onclick="filterCategory('metodo', event)"
+            <button data-filter="tecnico" onclick="filterCategory('tecnico', event)"
+                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Técnico</button>
+            <button data-filter="metodo" onclick="filterCategory('metodo', event)"
                 class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Método</button>
         </div>
     </div>
 
-    <!-- Main Layout -->
     <div class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 flex flex-col md:flex-row gap-8">
 
-        <!-- Left Sidebar (Navigation) -->
+        <!-- Left Sidebar -->
         <aside class="w-full md:w-64 flex-shrink-0 hidden md:block">
-            <div class="sticky top-24 space-y-8">
+            <div class="sticky top-8 space-y-8">
 
-                <!-- Main CTA -->
-                <button onclick="openModal()"
-                    class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating hover:shadow-brand-500/25 transition-all transform hover:-translate-y-0.5">
-                    <i class="ph cursor-text ph-pencil-simple text-lg"></i>
+                <button onclick="openModal()" aria-label="Abrir nueva consulta"
+                    class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating transition-all transform hover:-translate-y-0.5">
+                    <i class="ph ph-pencil-simple text-lg"></i>
                     Nueva Consulta
                 </button>
 
-                <!-- Navigation Sections -->
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Comunidad</h3>
                     <div class="space-y-1">
-                        <a href="#" onclick="filterCategory(null, event)"
+                        <a href="#" data-filter="all" onclick="filterCategory(null, event)"
                             class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-house text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Todo el Feed
                         </a>
-                        <a href="#" onclick="filterPending(event)"
+                        <a href="#" data-filter="pending" onclick="filterPending(event)"
                             class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-clock text-lg text-gray-400 group-hover:text-gray-600"></i>
-                            Consultas Pendientes
+                            Pendientes
+                        </a>
+                        <a href="#" data-filter="resolved" onclick="filterResolved(event)"
+                            class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <i class="ph ph-check-circle text-lg text-gray-400 group-hover:text-gray-600"></i>
+                            Resueltas
                         </a>
                     </div>
                 </div>
 
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Categorías</h3>
-                    <div class="space-y-1">
-                        <a href="#"
-                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('acceso', event)">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-blue-400"></span>
-                                Acceso y cuenta
-                            </div>
-                            <span
-                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="acceso">0</span>
-                        </a>
-                        <a href="#"
-                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('gramatica', event)">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-green-400"></span>
-                                Gramática
-                            </div>
-                            <span
-                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="gramatica">0</span>
-                        </a>
-                        <a href="#"
-                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('comunidad', event)">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-purple-400"></span>
-                                Comunidad
-                            </div>
-                            <span
-                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="comunidad">0</span>
-                        </a>
-                        <a href="#"
-                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('recursos', event)">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
-                                Recursos
-                            </div>
-                            <span
-                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="recursos">0</span>
-                        </a>
-                        <a href="#"
-                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('tecnico', event)">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-red-400"></span>
-                                Problemas técnicos
-                            </div>
-                            <span
-                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="tecnico">0</span>
-                        </a>
-                        <a href="#"
-                            class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group"
-                            onclick="filterCategory('metodo', event)">
-                            <div class="flex items-center gap-3">
-                                <span class="w-3 h-3 rounded-full bg-orange-400"></span>
-                                Método y Estudio
-                            </div>
-                            <span
-                                class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count"
-                                data-cat="metodo">0</span>
-                        </a>
-                    </div>
+                    <div class="space-y-1" id="categoriesNav"></div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Feed Content -->
+        <!-- Main Feed -->
         <main class="flex-1 w-full max-w-3xl">
-            <!-- Feed Header & Filters -->
-            <div class="mb-6 pb-4 border-b border-gray-200">
-                <h1 class="text-2xl font-bold tracking-tight text-gray-900 mb-2">Revisa o haz una consulta</h1>
 
+            <!-- Hero Buscador -->
+            <section id="searchHero"
+                class="relative bg-gradient-to-br from-brand-50 via-white to-brand-50/50 border border-brand-100 rounded-2xl p-6 md:p-8 mb-6 overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-brand-500/5 rounded-full blur-3xl"></div>
+                <div class="relative">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div class="hidden sm:flex w-10 h-10 rounded-xl bg-brand-600 items-center justify-center flex-shrink-0">
+                            <i class="ph-fill ph-magnifying-glass text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
+                                Antes de preguntar, busca aquí
+                            </h1>
+                            <p class="text-sm text-gray-600 mt-0.5">
+                                Quizás tu duda ya está resuelta por nuestro equipo.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative mt-4">
+                        <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400"></i>
+                        <input id="searchInput" type="text" autocomplete="off"
+                            placeholder="Ej: zullen, het vs de, pronunciación de la g…"
+                            class="w-full pl-12 pr-12 py-3.5 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors" />
+                        <button id="searchClear" onclick="clearSearch()" aria-label="Limpiar búsqueda"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
+                            <i class="ph ph-x-circle text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div id="searchResults" class="hidden mt-5 space-y-3"></div>
+
+                    <div id="searchEmpty" class="hidden mt-5 bg-white rounded-xl p-5 border border-dashed border-gray-200 text-center">
+                        <p class="text-sm text-gray-700 mb-3">
+                            <i class="ph ph-info text-brand-500"></i>
+                            No encontramos consultas sobre eso. ¿Quieres preguntarlo tú?
+                        </p>
+                        <button onclick="openModal()"
+                            class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-colors">
+                            <i class="ph ph-pencil-simple"></i> Hacer mi consulta
+                        </button>
+                    </div>
+
+                    <div id="searchLoading" class="hidden mt-5 text-center text-gray-500 text-sm">
+                        <i class="ph ph-spinner-gap animate-spin"></i> Buscando…
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feed Header -->
+            <div class="mb-6 pb-4 border-b border-gray-200">
+                <h2 id="feedTitle" class="text-2xl font-bold tracking-tight text-gray-900 mb-2">Todas las consultas</h2>
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2 text-sm">
                         <span class="text-gray-500">Ordenar por:</span>
                         <select id="sortSelect" onchange="loadFeed()"
-                            class="bg-transparent font-medium text-gray-900 focus:outline-none focus:ring-0 cursor-pointer">
+                            class="bg-transparent font-medium text-gray-900 focus:outline-none cursor-pointer">
                             <option value="desc">Más recientes</option>
                             <option value="asc">Más antiguas</option>
                         </select>
@@ -292,63 +251,53 @@
                 </div>
             </div>
 
-            <!-- Loading Spinner -->
-            <div id="loadingFeed" class="flex justify-center items-center py-12">
-                <i class="ph ph-spinner-gap animate-spin text-4xl text-brand-500"></i>
+            <!-- Feed skeleton -->
+            <div id="feedSkeleton" class="space-y-4">
+                <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="skeleton h-4 w-1/3 mb-3"></div><div class="skeleton h-5 w-2/3 mb-2"></div><div class="skeleton h-3 w-full mb-1"></div><div class="skeleton h-3 w-5/6"></div></div>
+                <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="skeleton h-4 w-1/3 mb-3"></div><div class="skeleton h-5 w-2/3 mb-2"></div><div class="skeleton h-3 w-full mb-1"></div><div class="skeleton h-3 w-5/6"></div></div>
+                <div class="bg-white rounded-2xl p-5 border border-gray-100"><div class="skeleton h-4 w-1/3 mb-3"></div><div class="skeleton h-5 w-2/3 mb-2"></div><div class="skeleton h-3 w-full mb-1"></div><div class="skeleton h-3 w-5/6"></div></div>
             </div>
 
-            <!-- Posts List (Dynamic Container) -->
-            <div id="feedContainer" class="space-y-4 hidden">
-                <!-- Posts will be injected here via JavaScript -->
-            </div>
+            <div id="feedContainer" class="space-y-4 hidden"></div>
 
-            <!-- Pagination / Load More -->
             <div id="loadMoreContainer" class="mt-8 flex justify-center hidden">
                 <button onclick="loadMore()"
-                    class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm text-sm">
+                    class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm">
                     Cargar más consultas
                 </button>
             </div>
         </main>
 
-        <!-- Right Sidebar (Extra Context & Leaderboard) -->
+        <!-- Right Sidebar -->
         <aside class="w-full md:w-72 flex-shrink-0 hidden lg:block space-y-6">
-
             <div class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100">
                 <h3 class="flex items-center gap-2 font-bold text-gray-900 mb-4">
                     <i class="ph-fill ph-info text-brand-500 text-xl"></i>
                     Sobre las Consultas
                 </h3>
                 <p class="text-sm text-gray-600 leading-relaxed mb-4">
-                    Este es tu espacio para resolver dudas sobre el idioma. Nuestro equipo y otros alumnos avanzados te
-                    ayudarán lo antes posible.
+                    Este es tu espacio para resolver dudas sobre el idioma o la formación.
+                    Nuestro equipo te responderá lo antes posible y te avisaremos por email.
                 </p>
-                <div
-                    class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800 font-medium border border-brand-100 flex items-start gap-2">
+                <div class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800 font-medium border border-brand-100 flex items-start gap-2">
                     <i class="ph-fill ph-lightbulb mt-0.5"></i>
-                    <div>Recuerda buscar primero, ¡tu duda podría estar ya resuelta!</div>
+                    <div>Recuerda buscar primero en el cuadro de arriba — ¡tu duda podría estar ya resuelta!</div>
                 </div>
             </div>
-
-
-
         </aside>
-
     </div>
 
-    <!-- New Consultation Modal Overlay -->
-    <div id="newPostModal"
+    <!-- New Consultation Modal -->
+    <div id="newPostModal" role="dialog" aria-modal="true" aria-labelledby="newPostModalTitle"
         class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
 
-        <!-- Modal Content -->
         <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300"
             id="modalContainer">
 
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
-                <h2 class="text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
-                <button onclick="closeModal()"
+                <h2 id="newPostModalTitle" class="text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
+                <button onclick="closeModal()" aria-label="Cerrar modal"
                     class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
                     <i class="ph ph-x text-xl"></i>
                 </button>
@@ -356,26 +305,33 @@
 
             <div class="p-6 overflow-y-auto flex-1 space-y-5 bg-gray-50/50">
 
-                <!-- Guest User Info Fields (Always shown for embedded) -->
-                <div id="guestFields" class="grid grid-cols-2 gap-4">
+                <div id="userGreeting" class="hidden bg-brand-50 border border-brand-100 text-brand-900 rounded-xl px-4 py-3 text-sm flex items-center gap-3">
+                    <i class="ph-fill ph-user-circle text-2xl text-brand-600"></i>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tu Nombre</label>
+                        Publicando como <strong id="userGreetingName"></strong>
+                        <span id="userGreetingEmail" class="text-brand-700/80 block text-xs"></span>
+                    </div>
+                </div>
+
+                <div id="guestFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="postName" class="block text-sm font-medium text-gray-700 mb-1.5">Tu nombre</label>
                         <input type="text" id="postName" placeholder="Ej: Carlos"
                             class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Tu Correo Electrónico</label>
-                        <input type="email" id="postEmail" placeholder="Para notificarte la respuesta"
+                        <label for="postEmail" class="block text-sm font-medium text-gray-700 mb-1.5">Tu email</label>
+                        <input type="email" id="postEmail" placeholder="Para avisarte de la respuesta"
                             class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
+                    <label for="postCategory" class="block text-sm font-medium text-gray-700 mb-1.5">Categoría</label>
                     <div class="relative">
                         <select id="postCategory"
-                            class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:bg-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
-                            <option value="" disabled selected>Selecciona un tema...</option>
+                            class="block w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-8 rounded-xl leading-tight focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors">
+                            <option value="" disabled selected>Selecciona un tema…</option>
                             <option value="acceso">Acceso y cuenta</option>
                             <option value="gramatica">Gramática</option>
                             <option value="comunidad">Comunidad</option>
@@ -383,53 +339,41 @@
                             <option value="tecnico">Problemas técnicos</option>
                             <option value="metodo">Método y Estudio</option>
                         </select>
-                        <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
                             <i class="ph ph-caret-down"></i>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Título de tu consulta</label>
+                    <label for="postTitle" class="block text-sm font-medium text-gray-700 mb-1.5">Título de tu consulta</label>
                     <input type="text" id="postTitle" placeholder="Sé específico (ej: ¿Cómo uso el verbo 'zullen'?)"
                         class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 font-medium transition-colors bg-white">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Detalles de tu duda</label>
-
-                    <!-- Real Rich Text Toolbar -->
-                    <div
-                        class="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
+                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
                         <div class="flex items-center gap-1 bg-gray-50 border-b border-gray-200 px-3 py-2">
-                            <button type="button" onclick="formatText('bold')"
-                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
-                                    class="ph ph-text-b"></i></button>
-                            <button type="button" onclick="formatText('italic')"
-                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
-                                    class="ph ph-text-italic"></i></button>
-                            <button type="button" onclick="formatText('underline')"
-                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
-                                    class="ph ph-text-underline"></i></button>
+                            <button type="button" onclick="formatText('bold')" aria-label="Negrita"
+                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-b"></i></button>
+                            <button type="button" onclick="formatText('italic')" aria-label="Cursiva"
+                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-italic"></i></button>
+                            <button type="button" onclick="formatText('underline')" aria-label="Subrayado"
+                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-underline"></i></button>
                             <div class="w-px h-4 bg-gray-300 mx-1"></div>
-                            <button type="button" onclick="formatText('insertOrderedList')"
-                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
-                                    class="ph ph-list-numbers"></i></button>
-                            <button type="button" onclick="formatText('insertUnorderedList')"
-                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i
-                                    class="ph ph-list-bullets"></i></button>
+                            <button type="button" onclick="formatText('insertOrderedList')" aria-label="Lista numerada"
+                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-numbers"></i></button>
+                            <button type="button" onclick="formatText('insertUnorderedList')" aria-label="Lista de viñetas"
+                                class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-bullets"></i></button>
                         </div>
                         <div id="postContent" contenteditable="true"
-                            class="w-full px-4 py-3 text-gray-900 focus:outline-none min-h-[150px] max-h-[300px] overflow-y-auto bg-white font-normal outline-none"
-                            placeholder="Explica tu duda con el mayor detalle posible para que podamos ayudarte mejor...">
-                        </div>
+                            class="w-full px-4 py-3 text-gray-900 focus:outline-none min-h-[150px] max-h-[300px] overflow-y-auto bg-white"
+                            placeholder="Explica tu duda con el mayor detalle posible para que podamos ayudarte mejor…"></div>
                     </div>
                 </div>
-
             </div>
 
-            <!-- Error/Success Message Container -->
             <div id="modalMessage" class="hidden px-6 py-2 text-sm font-medium"></div>
 
             <div class="p-6 border-t border-gray-100 bg-white rounded-b-2xl flex items-center justify-end">
@@ -437,77 +381,67 @@
                     <button type="button" onclick="closeModal()"
                         class="px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
                     <button type="button" id="submitPostBtn" onclick="submitPost()"
-                        class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating hover:shadow-brand-500/25 transition-all flex items-center gap-2 whitespace-nowrap">
+                        class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating transition-all flex items-center gap-2 whitespace-nowrap">
                         <i class="ph ph-paper-plane-right"></i>
-                        <span>Publicar Consulta</span>
+                        <span>Publicar consulta</span>
                     </button>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- View Consultation Detail Modal Overlay -->
-    <div id="viewPostModal"
+    <!-- View Detail Modal -->
+    <div id="viewPostModal" role="dialog" aria-modal="true"
         class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onclick="closeViewModal()"></div>
 
-        <!-- Modal Content -->
         <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300 overflow-hidden"
             id="viewModalContainer">
 
             <div class="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
                 <div id="viewModalBadge"></div>
-                <button onclick="closeViewModal()"
-                    class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
-                    <i class="ph ph-x text-xl"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="copyDeeplink()" aria-label="Copiar enlace"
+                        class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full" title="Copiar enlace">
+                        <i class="ph ph-link text-lg"></i>
+                    </button>
+                    <button onclick="closeViewModal()" aria-label="Cerrar modal"
+                        class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
+                        <i class="ph ph-x text-xl"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-white">
-                <!-- Header Info -->
                 <div class="flex items-center gap-4">
-                    <img id="viewPostAvatar" src="" class="w-12 h-12 rounded-full border-2 border-brand-100"
-                        alt="Avatar">
+                    <img id="viewPostAvatar" src="" class="w-12 h-12 rounded-full border-2 border-brand-100" alt="">
                     <div>
                         <h4 id="viewPostAuthor" class="text-base font-bold text-gray-900"></h4>
                         <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span id="viewPostTime" class="whitespace-nowrap"></span>
-                            <span class="hidden xs:block">&bull;</span>
-                            <span id="viewPostCategory"
-                                class="font-medium uppercase tracking-wider text-brand-600 whitespace-nowrap"></span>
+                            <span id="viewPostTime"></span>
+                            <span>•</span>
+                            <span id="viewPostCategory" class="font-medium uppercase tracking-wider text-brand-600"></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-4">
                     <h2 id="viewPostTitle" class="text-2xl font-extrabold text-gray-900 leading-tight"></h2>
-                    <div id="viewPostContent"
-                        class="text-gray-700 text-base leading-relaxed post-content-display space-y-3 break-words">
-                    </div>
+                    <div id="viewPostContent" class="text-gray-700 text-base leading-relaxed post-content-display space-y-3 break-words"></div>
                 </div>
 
-                <!-- Admin Response Area -->
                 <div id="viewPostReply" class="hidden">
                     <div class="mt-8 pt-6 border-t border-gray-100">
-                        <div class="bg-brand-50 rounded-2xl p-6 border border-brand-100 relative overflow-hidden group">
-                            <div
-                                class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <i class="ph-fill ph-student text-6xl text-brand-600"></i>
-                            </div>
+                        <div class="bg-brand-50 rounded-2xl p-6 border border-brand-100 relative overflow-hidden">
                             <div class="relative">
                                 <h4 class="text-brand-900 font-bold flex items-center gap-2 mb-3">
                                     <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center">
                                         <i class="ph ph-student text-white text-lg"></i>
                                     </div>
                                     Equipo Nawar
-                                    <i class="ph-fill ph-seal-check text-brand-500 text-xs"
-                                        title="Respuesta Oficial"></i>
+                                    <i class="ph-fill ph-seal-check text-brand-500 text-xs" title="Respuesta oficial"></i>
                                 </h4>
-                                <div id="viewReplyText"
-                                    class="text-gray-800 text-base leading-relaxed post-content-display space-y-3 break-words">
-                                </div>
+                                <div id="viewReplyText" class="text-gray-800 text-base leading-relaxed post-content-display space-y-3 break-words"></div>
                             </div>
                         </div>
                     </div>
@@ -517,51 +451,138 @@
             <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
                 <button onclick="closeViewModal()"
                     class="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-gray-800 transition-all active:scale-95">
-                    Cerrar Consulta
+                    Cerrar
                 </button>
             </div>
-
         </div>
     </div>
 
-    <script>
-        // --- Supabase Configuration ---
-        // INSTRUCCIÓN: Rellena estas dos variables con la URL y la Anon Key de tu proyecto Supabase.
-        const supabaseUrl = 'https://alifjhqjmedstkafnrmp.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsaWZqaHFqbWVkc3RrYWZucm1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTA4MTUsImV4cCI6MjA4Nzg2NjgxNX0.Gz0tMmEy1rcNdjaH7pYkoySMm3PBczmgCuaWobMdOtQ';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg"></div>
 
-        let currentCategoryFilter = null;
-        let showOnlyPending = false;
-        let lastLoadedRow = 0;
+    <script>
+        const SUPABASE_URL = 'https://alifjhqjmedstkafnrmp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsaWZqaHFqbWVkc3RrYWZucm1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTA4MTUsImV4cCI6MjA4Nzg2NjgxNX0.Gz0tMmEy1rcNdjaH7pYkoySMm3PBczmgCuaWobMdOtQ';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const POSTS_PER_PAGE = 5;
 
-        function formatText(command) {
-            document.execCommand(command, false, null);
-            document.getElementById('postContent').focus();
+        const CATEGORY_DATA = [
+            { id: 'acceso',    name: 'Acceso y cuenta',     color: 'blue'   },
+            { id: 'gramatica', name: 'Gramática',           color: 'green'  },
+            { id: 'comunidad', name: 'Comunidad',           color: 'purple' },
+            { id: 'recursos',  name: 'Recursos',            color: 'yellow' },
+            { id: 'tecnico',   name: 'Problemas técnicos',  color: 'red'    },
+            { id: 'metodo',    name: 'Método y Estudio',    color: 'orange' },
+        ];
+        const CAT_BY_ID = Object.fromEntries(CATEGORY_DATA.map(c => [c.id, c]));
+
+        let currentCategoryFilter = null;
+        let currentResolvedFilter = null;
+        let lastLoadedRow = 0;
+        let postsCache = new Map();
+        let currentViewedPostId = null;
+        let searchDebounceTimer = null;
+
+        const escapeHTML = (str = '') => String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        const sanitizeHTML = (html = '') => DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'u', 'br', 'p', 'div', 'ul', 'ol', 'li', 'span'],
+            ALLOWED_ATTR: []
+        });
+
+        function timeAgo(dateString) {
+            if (!dateString) return 'hace un momento';
+            const date = new Date(dateString);
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'hace un momento';
+            const intervals = [
+                { unit: 'año',  s: 31536000 },
+                { unit: 'mes',  s: 2592000  },
+                { unit: 'día',  s: 86400    },
+                { unit: 'hora', s: 3600     },
+                { unit: 'min',  s: 60       },
+            ];
+            for (const i of intervals) {
+                const v = Math.floor(seconds / i.s);
+                if (v >= 1) {
+                    const plural = v > 1 ? (i.unit === 'mes' ? 'meses' : i.unit + 's') : i.unit;
+                    return `hace ${v} ${plural}`;
+                }
+            }
+            return 'hace un momento';
         }
 
-        // --- Modal Logic ---
+        function avatarFor(name) {
+            const safe = encodeURIComponent(name || 'Anónimo');
+            return `https://ui-avatars.com/api/?name=${safe}&background=2563eb&color=fff&bold=true`;
+        }
+
+        function showToast(msg, ms = 2200) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.remove('hidden');
+            clearTimeout(showToast._tid);
+            showToast._tid = setTimeout(() => t.classList.add('hidden'), ms);
+        }
+
+        function loadIdentityFromURL() {
+            const params = new URLSearchParams(location.search);
+            const email = params.get('email');
+            const name = params.get('name');
+            if (email) sessionStorage.setItem('nawarUserEmail', email);
+            if (name) sessionStorage.setItem('nawarUserName', name);
+        }
+
+        function getIdentity() {
+            return {
+                name: sessionStorage.getItem('nawarUserName') || '',
+                email: sessionStorage.getItem('nawarUserEmail') || '',
+            };
+        }
+
+        function applyIdentityToModal() {
+            const { name, email } = getIdentity();
+            const greeting = document.getElementById('userGreeting');
+            const guestFields = document.getElementById('guestFields');
+            if (name && email) {
+                document.getElementById('postName').value = name;
+                document.getElementById('postEmail').value = email;
+                document.getElementById('userGreetingName').textContent = name;
+                document.getElementById('userGreetingEmail').textContent = email;
+                greeting.classList.remove('hidden');
+                guestFields.classList.add('hidden');
+            } else {
+                greeting.classList.add('hidden');
+                guestFields.classList.remove('hidden');
+            }
+        }
+
         const modal = document.getElementById('newPostModal');
         const modalContainer = document.getElementById('modalContainer');
 
         function openModal() {
+            applyIdentityToModal();
             modal.classList.remove('hidden');
-            void modal.offsetWidth; // trigger reflow
+            void modal.offsetWidth;
             modal.classList.remove('opacity-0');
             modalContainer.classList.remove('scale-95');
             document.body.style.overflow = 'hidden';
 
-            // clear previous messages
-            const msgBox = document.getElementById('modalMessage');
-            msgBox.classList.add('hidden');
-            msgBox.className = "hidden px-6 py-2 text-sm font-medium";
-            msgBox.innerHTML = "";
+            const msg = document.getElementById('modalMessage');
+            msg.classList.add('hidden');
+            msg.className = 'hidden px-6 py-2 text-sm font-medium';
+            msg.innerHTML = '';
 
-            // Generate dummy official post if feed is empty initially to test the view
-            if (document.getElementById('feedContainer').children.length === 0) {
-                loadFeed();
-            }
+            setTimeout(() => {
+                const { name, email } = getIdentity();
+                const target = (name && email)
+                    ? document.getElementById('postCategory')
+                    : document.getElementById('postName');
+                target?.focus();
+            }, 100);
         }
 
         function closeModal() {
@@ -572,232 +593,53 @@
                 document.body.style.overflow = '';
             }, 300);
 
-            // Reset form
             document.getElementById('postTitle').value = '';
             document.getElementById('postContent').innerHTML = '';
             document.getElementById('postCategory').selectedIndex = 0;
-            document.getElementById('postName').value = '';
-            document.getElementById('postEmail').value = '';
+            const { name, email } = getIdentity();
+            if (!name || !email) {
+                document.getElementById('postName').value = '';
+                document.getElementById('postEmail').value = '';
+            }
         }
 
         function showMessage(msg, isError = false) {
             const box = document.getElementById('modalMessage');
-            box.innerHTML = msg;
+            box.textContent = msg;
             box.className = `px-6 py-2 text-sm font-medium rounded-lg mb-4 mx-6 ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
             box.classList.remove('hidden');
         }
 
-        // --- Database Logic (Supabase) ---
-        async function submitPost() {
-            const btn = document.getElementById('submitPostBtn');
-            const originalContent = btn.innerHTML;
-
-            const title = document.getElementById('postTitle').value.trim();
-            const content = document.getElementById('postContent').innerHTML.trim();
-            const categorySelect = document.getElementById('postCategory');
-            const category = categorySelect.options[categorySelect.selectedIndex].value;
-
-            const authorName = document.getElementById('postName').value.trim();
-            const authorEmail = document.getElementById('postEmail').value.trim();
-
-            if (!authorName || !authorEmail) {
-                showMessage("Por favor, ingresa tu nombre y correo.", true);
-                return;
-            }
-
-            // Validation
-            if (!category || title === '' || content === '') {
-                showMessage("Por favor, rellena la categoría, título y detalles de tu duda.", true);
-                return;
-            }
-
-            const authorPhoto = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
-
-            // Loading state
-            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Publicando...`;
-            btn.disabled = true;
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-            try {
-                // Save to Supabase
-                const postData = {
-                    title: title,
-                    content: content,
-                    category: category,
-                    author_name: authorName,
-                    author_email: authorEmail,
-                    author_photo: authorPhoto,
-                    likes: 0,
-                    replies: 0,
-                    resolved: false
-                };
-
-                const { data, error } = await supabaseClient
-                    .from('consultas')
-                    .insert([postData]);
-
-                if (error) throw error;
-
-                showMessage("¡Consulta publicada con éxito! Recargando feed...");
-
-                setTimeout(() => {
-                    closeModal();
-                    loadFeed(); // Reload feed to show new post
-                    // Reset button
-                    btn.innerHTML = originalContent;
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                }, 1500);
-
-            } catch (error) {
-                console.error("Error adding document: ", error);
-                showMessage("Error al publicar: verifica la conexión a Supabase. (" + error.message + ")", true);
-                // Reset button
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-                btn.classList.remove('opacity-75', 'cursor-not-allowed');
-            }
-        }
-
-        // --- Feed Logic ---
-
-        // Helper to format timestamps gracefully
-        function timeAgo(dateString) {
-            if (!dateString) return "Justo ahora";
-            const date = new Date(dateString);
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + " años";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + " meses";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + " días";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + " horas";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + " min";
-            return "Hace unos instantes";
-        }
-
-        // Get color class for category
-        function getCategoryColor(cat) {
-            switch (cat) {
-                case 'acceso': return 'blue';
-                case 'gramatica': return 'green';
-                case 'comunidad': return 'purple';
-                case 'recursos': return 'yellow';
-                case 'tecnico': return 'indigo';
-                case 'metodo': return 'orange';
-                default: return 'gray';
-            }
-        }
-
-        // Helper to localize category
-        function getCategoryName(cat) {
-            switch (cat) {
-                case 'acceso': return 'Acceso y cuenta';
-                case 'gramatica': return 'Gramática';
-                case 'comunidad': return 'Comunidad';
-                case 'recursos': return 'Recursos';
-                case 'tecnico': return 'Problemas técnicos';
-                case 'metodo': return 'Método y Estudio';
-                default: return cat;
-            }
-        }
-
-        function createPostHTML(post) {
-            const category = post.category || 'Sin categoría';
-            const color = getCategoryColor(category);
-            const date = post.created_at || new Date();
-            const authorName = post.author_name || 'Anónimo';
-            const authorPhoto = post.author_photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random`;
-            const title = post.title || 'Sin título';
-            const content = post.content || '';
-            const id = post.id || Math.random().toString(36).substr(2, 9);
-
-            const isResolved = post.resolved === true || post.resolved === 'true';
-
-            let badgeHTML = '';
-            if (isResolved) {
-                badgeHTML = `
-                <div class="flex flex-shrink-0 items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100">
-                    <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelta
-                </div>
-                `;
-            } else {
-                badgeHTML = `
-                <div class="flex flex-shrink-0 items-center text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-amber-100">
-                    <i class="ph-fill ph-clock mr-1 text-sm"></i> Pendiente
-                </div>
-                `;
-            }
-
-            // Store post data in a global-ish way for the modal to access easily
-            // We'll use a data attribute or just pass it in onclick
-            const jsonPost = JSON.stringify(post).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-
-            return `
-                <article class="bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-200 transition-all group md:cursor-pointer" onclick='openViewModal(${jsonPost})'>
-                    <div class="flex items-start justify-between mb-3 gap-4">
-                        <div class="flex items-center gap-3">
-                            <img src="${authorPhoto}" class="w-10 h-10 rounded-full" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random'">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-900">${authorName}</h4>
-                                <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <span class="whitespace-nowrap">${timeAgo(date)}</span>
-                                    <span class="hidden xs:block">&bull;</span>
-                                    <span class="inline-flex items-center gap-1 text-${color}-600 bg-${color}-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide whitespace-nowrap">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-${color}-500"></span>
-                                        ${getCategoryName(category)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        ${badgeHTML}
-                    </div>
-                    
-                    <h2 class="text-lg font-bold text-gray-900 mb-2">${title}</h2>
-                    <div class="text-gray-600 text-sm mb-2 leading-relaxed line-clamp-2">${content}</div>
-                    
-                    <div class="text-brand-600 text-sm font-bold mt-3 flex items-center gap-1">
-                        Ver detalles <i class="ph ph-arrow-right"></i>
-                    </div>
-                </article>
-            `;
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('postContent').focus();
         }
 
         const viewModal = document.getElementById('viewPostModal');
         const viewModalContainer = document.getElementById('viewModalContainer');
 
         function openViewModal(post) {
-            document.getElementById('viewPostAvatar').src = post.author_photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author_name)}&background=random`;
+            currentViewedPostId = post.id;
+            const cat = CAT_BY_ID[post.category];
+
+            document.getElementById('viewPostAvatar').src = avatarFor(post.author_name);
+            document.getElementById('viewPostAvatar').alt = `Avatar de ${post.author_name || 'Anónimo'}`;
             document.getElementById('viewPostAuthor').textContent = post.author_name || 'Anónimo';
             document.getElementById('viewPostTime').textContent = timeAgo(post.created_at);
-            document.getElementById('viewPostCategory').textContent = getCategoryName(post.category);
+            document.getElementById('viewPostCategory').textContent = cat?.name || post.category || '';
             document.getElementById('viewPostTitle').textContent = post.title || 'Sin título';
-            document.getElementById('viewPostContent').innerHTML = post.content || '';
+            document.getElementById('viewPostContent').innerHTML = sanitizeHTML(post.content || '');
 
-            const isResolved = post.resolved === true || post.resolved === 'true';
             const badgeBox = document.getElementById('viewModalBadge');
-            if (isResolved) {
-                badgeBox.innerHTML = `
-                    <div class="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full text-xs font-bold border border-green-100">
-                        <i class="ph-fill ph-check-circle mr-1 text-sm"></i> Consulta Resuelta
-                    </div>
-                `;
-            } else {
-                badgeBox.innerHTML = `
-                    <div class="flex items-center text-amber-600 bg-amber-50 px-3 py-1 rounded-full text-xs font-bold border border-amber-100">
-                        <i class="ph-fill ph-clock mr-1 text-sm"></i> Consulta Pendiente
-                    </div>
-                `;
-            }
+            badgeBox.innerHTML = post.resolved
+                ? `<div class="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full text-xs font-bold border border-green-100"><i class="ph-fill ph-check-circle mr-1 text-sm"></i> Consulta resuelta</div>`
+                : `<div class="flex items-center text-amber-600 bg-amber-50 px-3 py-1 rounded-full text-xs font-bold border border-amber-100"><i class="ph-fill ph-clock mr-1 text-sm"></i> Consulta pendiente</div>`;
 
-            const adminReply = post.respuesta_nawar || post.admin_reply || '';
+            const reply = post.respuesta_nawar || '';
             const replySection = document.getElementById('viewPostReply');
-            if (adminReply) {
+            if (reply) {
                 replySection.classList.remove('hidden');
-                document.getElementById('viewReplyText').innerHTML = adminReply;
+                document.getElementById('viewReplyText').innerHTML = sanitizeHTML(reply);
             } else {
                 replySection.classList.add('hidden');
             }
@@ -807,6 +649,10 @@
             viewModal.classList.remove('opacity-0');
             viewModalContainer.classList.remove('scale-95');
             document.body.style.overflow = 'hidden';
+
+            const url = new URL(location.href);
+            url.searchParams.set('id', post.id);
+            history.replaceState(null, '', url);
         }
 
         function closeViewModal() {
@@ -816,202 +662,423 @@
                 viewModal.classList.add('hidden');
                 document.body.style.overflow = '';
             }, 300);
+            currentViewedPostId = null;
+
+            const url = new URL(location.href);
+            url.searchParams.delete('id');
+            history.replaceState(null, '', url);
+        }
+
+        function copyDeeplink() {
+            if (!currentViewedPostId) return;
+            const url = new URL(location.href);
+            url.searchParams.set('id', currentViewedPostId);
+            navigator.clipboard.writeText(url.toString())
+                .then(() => showToast('Enlace copiado'))
+                .catch(() => showToast('No se pudo copiar', 2200));
+        }
+
+        async function submitPost() {
+            const btn = document.getElementById('submitPostBtn');
+            const originalContent = btn.innerHTML;
+
+            const title = document.getElementById('postTitle').value.trim();
+            const rawContent = document.getElementById('postContent').innerHTML.trim();
+            const content = sanitizeHTML(rawContent);
+            const category = document.getElementById('postCategory').value;
+            const authorName = document.getElementById('postName').value.trim();
+            const authorEmail = document.getElementById('postEmail').value.trim();
+
+            if (!authorName || !authorEmail) {
+                showMessage('Por favor, rellena nombre y email.', true);
+                return;
+            }
+            if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(authorEmail)) {
+                showMessage('El email no es válido.', true);
+                return;
+            }
+            if (!category || !title || !content || content === '<br>' || content === '<div><br></div>') {
+                showMessage('Selecciona categoría, escribe título y detalles.', true);
+                return;
+            }
+            if (title.length > 200) {
+                showMessage('El título es muy largo (máx. 200 caracteres).', true);
+                return;
+            }
+
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Publicando…`;
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                const { error } = await supabaseClient
+                    .from('consultas')
+                    .insert([{
+                        title, content, category,
+                        author_name: authorName,
+                        author_email: authorEmail,
+                        author_photo: avatarFor(authorName),
+                        likes: 0, replies: 0,
+                        resolved: false,
+                    }]);
+                if (error) throw error;
+
+                sessionStorage.setItem('nawarUserName', authorName);
+                sessionStorage.setItem('nawarUserEmail', authorEmail);
+
+                showMessage('¡Consulta publicada con éxito!');
+                setTimeout(() => {
+                    closeModal();
+                    loadFeed();
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, 1200);
+            } catch (e) {
+                console.error(e);
+                showMessage(`Error al publicar: ${e.message || e}`, true);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        function postCardHTML(post) {
+            const cat = CAT_BY_ID[post.category] || { name: post.category || 'Sin categoría', color: 'gray' };
+            const color = cat.color;
+            const safeName = escapeHTML(post.author_name || 'Anónimo');
+            const safeTitle = escapeHTML(post.title || 'Sin título');
+            const safeContent = sanitizeHTML(post.content || '');
+
+            const badge = post.resolved
+                ? `<div class="flex flex-shrink-0 items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100"><i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelta</div>`
+                : `<div class="flex flex-shrink-0 items-center text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-amber-100"><i class="ph-fill ph-clock mr-1 text-sm"></i> Pendiente</div>`;
+
+            return `
+                <article data-post-id="${escapeHTML(post.id)}" class="post-card bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-200 transition-all cursor-pointer">
+                    <div class="flex items-start justify-between mb-3 gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${avatarFor(post.author_name)}" class="w-10 h-10 rounded-full" alt="">
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-900">${safeName}</h4>
+                                <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span>${timeAgo(post.created_at)}</span>
+                                    <span>•</span>
+                                    <span class="inline-flex items-center gap-1 text-${color}-600 bg-${color}-50 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-${color}-500"></span>
+                                        ${escapeHTML(cat.name)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        ${badge}
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-900 mb-2">${safeTitle}</h2>
+                    <div class="text-gray-600 text-sm mb-2 leading-relaxed line-clamp-2">${safeContent}</div>
+                    <div class="text-brand-600 text-sm font-bold mt-3 flex items-center gap-1">
+                        Ver detalles <i class="ph ph-arrow-right"></i>
+                    </div>
+                </article>
+            `;
         }
 
         async function loadFeed(isAppend = false) {
             const container = document.getElementById('feedContainer');
-            const spinner = document.getElementById('loadingFeed');
+            const skeleton = document.getElementById('feedSkeleton');
             const loadBtn = document.getElementById('loadMoreContainer');
-            const sortVal = document.getElementById('sortSelect').value;
 
             if (!isAppend) {
                 container.innerHTML = '';
                 container.classList.add('hidden');
-                spinner.classList.remove('hidden');
+                skeleton.classList.remove('hidden');
                 loadBtn.classList.add('hidden');
                 lastLoadedRow = 0;
             }
 
             try {
-                let query = supabaseClient.from('consultas').select('id, title, content, category, author_name, created_at, resolved, respuesta_nawar');
+                let query = supabaseClient
+                    .from('consultas')
+                    .select('id,title,content,category,author_name,created_at,resolved,respuesta_nawar');
 
-                if (currentCategoryFilter) {
-                    query = query.eq('category', currentCategoryFilter);
-                }
+                if (currentCategoryFilter) query = query.eq('category', currentCategoryFilter);
+                if (currentResolvedFilter !== null) query = query.eq('resolved', currentResolvedFilter);
 
-                if (showOnlyPending) {
-                    query = query.eq('resolved', false);
-                }
-
-                // Sorting
-                if (sortVal === 'asc') {
-                    query = query.order('created_at', { ascending: true });
-                } else {
-                    query = query.order('created_at', { ascending: false });
-                }
-
+                const sortVal = document.getElementById('sortSelect').value;
+                query = query.order('created_at', { ascending: sortVal === 'asc' });
                 query = query.range(lastLoadedRow, lastLoadedRow + POSTS_PER_PAGE - 1);
 
                 const { data, error } = await query;
-
                 if (error) throw error;
 
-                console.log("Fetched rows from Supabase:", data);
-
                 if ((!data || data.length === 0) && !isAppend) {
-                    container.innerHTML = `
-                        <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed">
-                            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="ph ph-empty text-3xl text-gray-400"></i>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900">Aún no hay consultas</h3>
-                            <p class="text-gray-500 text-sm mt-1 mb-4">¡Sé el primero en abrir una duda!</p>
-                            <button onclick="openModal()" class="text-brand-600 font-medium hover:underline">Abrir consulta</button>
-                        </div>
-                    `;
-                } else if (data && data.length > 0) {
-                    try {
-                        let html = '';
-                        data.forEach(post => {
-                            html += createPostHTML(post);
-                        });
-
-                        if (isAppend) {
-                            container.insertAdjacentHTML('beforeend', html);
-                        } else {
-                            container.innerHTML = html;
-                        }
-
-                        lastLoadedRow += data.length;
-
-                        // Show Load More if we got a full batch
-                        if (data.length === POSTS_PER_PAGE) {
-                            loadBtn.classList.remove('hidden');
-                        } else {
-                            loadBtn.classList.add('hidden');
-                        }
-                    } catch (renderError) {
-                        console.error("Error rendering posts:", renderError);
-                        container.innerHTML = `<div class="bg-red-50 p-6 rounded-2xl border border-red-200 shadow-sm my-4">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <i class="ph-fill ph-warning-circle text-2xl text-red-500"></i>
-                                    <h3 class="text-red-800 font-bold text-lg">Error de renderizado</h3>
-                                </div>
-                                <p class="text-red-600 text-sm mb-4">Se obtuvieron los datos pero hubo un error al mostrarlos. Esto puede ocurrir si los datos no coinciden con el formato esperado del código.</p>
-                                <pre class="bg-white p-3 rounded-lg text-xs text-red-800 overflow-x-auto border border-red-100">${renderError.message || renderError}</pre>
-                            </div>`;
-                        loadBtn.classList.add('hidden');
-                    }
-                } else {
-                    loadBtn.classList.add('hidden');
+                    container.innerHTML = renderEmptyState();
+                } else if (data?.length) {
+                    data.forEach(p => postsCache.set(p.id, p));
+                    const html = data.map(postCardHTML).join('');
+                    if (isAppend) container.insertAdjacentHTML('beforeend', html);
+                    else container.innerHTML = html;
+                    lastLoadedRow += data.length;
+                    if (data.length === POSTS_PER_PAGE) loadBtn.classList.remove('hidden');
+                    else loadBtn.classList.add('hidden');
                 }
 
                 container.classList.remove('hidden');
-
-                // Also update category counts opportunistically
-                try {
-                    updateCategoryCounts();
-                } catch (e) { console.error("Error updating counts:", e); }
-
+                updateCategoryCounts();
             } catch (e) {
-                console.error("Error loading feed:", e);
-                container.innerHTML = `<p class="text-red-500 text-center py-8">Error al cargar las consultas. Verifica tu conexión a Supabase.<br><span class="text-sm opacity-75">${e.message || e}</span></p>`;
+                console.error(e);
+                container.innerHTML = `<div class="bg-red-50 p-6 rounded-2xl border border-red-200 text-red-700 text-sm">Error al cargar las consultas. ${escapeHTML(e.message || '')}</div>`;
                 container.classList.remove('hidden');
             } finally {
-                spinner.classList.add('hidden');
+                skeleton.classList.add('hidden');
             }
         }
 
-        function loadMore() {
-            loadFeed(true);
+        function renderEmptyState() {
+            const isFiltered = currentCategoryFilter || currentResolvedFilter !== null;
+            if (isFiltered) {
+                return `
+                    <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed">
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ph ph-funnel text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900">Sin consultas en este filtro</h3>
+                        <p class="text-gray-500 text-sm mt-1 mb-4">Prueba a cambiar de categoría o ver el feed completo.</p>
+                        <button onclick="filterCategory(null)" class="text-brand-600 font-medium hover:underline">Ver todo el feed</button>
+                    </div>`;
+            }
+            return `
+                <div class="text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed">
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="ph ph-chats-circle text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900">Aún no hay consultas</h3>
+                    <p class="text-gray-500 text-sm mt-1 mb-4">¡Sé el primero en abrir una duda!</p>
+                    <button onclick="openModal()" class="text-brand-600 font-medium hover:underline">Abrir consulta</button>
+                </div>`;
+        }
+
+        function loadMore() { loadFeed(true); }
+
+        function filterCategory(categoryName, event) {
+            event?.preventDefault();
+            currentCategoryFilter = categoryName;
+            currentResolvedFilter = null;
+            updateActiveNavLinks(categoryName, null);
+            loadFeed(false);
         }
 
         function filterPending(event) {
-            if (event) event.preventDefault();
+            event?.preventDefault();
             currentCategoryFilter = null;
-            showOnlyPending = true;
+            currentResolvedFilter = false;
+            updateActiveNavLinks(null, false);
+            loadFeed(false);
+        }
+
+        function filterResolved(event) {
+            event?.preventDefault();
+            currentCategoryFilter = null;
+            currentResolvedFilter = true;
             updateActiveNavLinks(null, true);
             loadFeed(false);
         }
 
-        function filterCategory(categoryName, event) {
-            if (event) event.preventDefault();
-            currentCategoryFilter = categoryName;
-            showOnlyPending = false; // Always reset pending filter when selecting a specific category or 'Todo'
-            updateActiveNavLinks(categoryName, false);
-            loadFeed(false);
-        }
+        function updateActiveNavLinks(categoryName, resolvedFilter) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
 
-        function updateActiveNavLinks(categoryName, isPending) {
-            // Desktop
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            if (isPending) {
-                const pendingLink = Array.from(document.querySelectorAll('.nav-link')).find(link => link.textContent.includes('Consultas Pendientes'));
-                if (pendingLink) pendingLink.classList.add('active');
-            } else if (!categoryName) {
-                const allLink = Array.from(document.querySelectorAll('.nav-link')).find(link => link.textContent.includes('Todo el Feed'));
-                if (allLink) allLink.classList.add('active');
-            } else {
-                const catLink = Array.from(document.querySelectorAll('.cat-count')).find(el => el.dataset.cat === categoryName)?.closest('a');
-                if (catLink) catLink.classList.add('active');
-            }
+            let key = 'all';
+            if (resolvedFilter === false) key = 'pending';
+            else if (resolvedFilter === true) key = 'resolved';
+            else if (categoryName) key = categoryName;
 
-            // Mobile
-            document.querySelectorAll('.mobile-nav-link').forEach(link => {
-                link.classList.remove('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
-                link.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+            document.querySelectorAll(`.nav-link[data-filter="${key}"]`).forEach(l => l.classList.add('active'));
+
+            document.querySelectorAll('.mobile-nav-link').forEach(l => {
+                l.classList.remove('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
+                l.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
             });
-            let mobileLinkToActivate = null;
-            if (isPending) {
-                mobileLinkToActivate = Array.from(document.querySelectorAll('.mobile-nav-link')).find(link => link.textContent.includes('Pendientes'));
-            } else if (!categoryName) {
-                mobileLinkToActivate = Array.from(document.querySelectorAll('.mobile-nav-link')).find(link => link.textContent.includes('Todo'));
-            } else {
-                mobileLinkToActivate = Array.from(document.querySelectorAll('.mobile-nav-link')).find(link => link.getAttribute('onclick')?.includes(`'${categoryName}'`));
-            }
-            if (mobileLinkToActivate) {
-                mobileLinkToActivate.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
-                mobileLinkToActivate.classList.add('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
-            }
+            document.querySelectorAll(`.mobile-nav-link[data-filter="${key}"]`).forEach(l => {
+                l.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                l.classList.add('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
+            });
 
-            // Update Header Title
-            const headerTitle = document.querySelector('h1.tracking-tight');
-            const categoriesMap = {
-                'acceso': 'Acceso y cuenta',
-                'gramatica': 'Gramática',
-                'comunidad': 'Comunidad',
-                'recursos': 'Recursos',
-                'tecnico': 'Problemas técnicos',
-                'metodo': 'Método y Estudio'
-            };
-            if (headerTitle) {
-                if (isPending) headerTitle.textContent = "Consultas Pendientes";
-                else if (categoryName) headerTitle.textContent = `Consultas: ${categoriesMap[categoryName]}`;
-                else headerTitle.textContent = "Revisa o haz una consulta";
-            }
+            const title = document.getElementById('feedTitle');
+            if (resolvedFilter === false) title.textContent = 'Consultas pendientes';
+            else if (resolvedFilter === true) title.textContent = 'Consultas resueltas';
+            else if (categoryName) title.textContent = `Consultas: ${CAT_BY_ID[categoryName]?.name || categoryName}`;
+            else title.textContent = 'Todas las consultas';
         }
 
-        // Just to populate initial counters dynamically
+        function buildCategoriesNav() {
+            const wrap = document.getElementById('categoriesNav');
+            wrap.innerHTML = CATEGORY_DATA.map(c => `
+                <a href="#" data-filter="${c.id}" data-cat="${c.id}"
+                    class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-${c.color}-400"></span>
+                        ${c.name}
+                    </div>
+                    <span class="bg-gray-100 text-gray-500 py-0.5 px-2 rounded-md text-xs group-hover:bg-white cat-count" data-cat="${c.id}">0</span>
+                </a>
+            `).join('');
+            wrap.querySelectorAll('a').forEach(a => {
+                a.addEventListener('click', (e) => filterCategory(a.dataset.cat, e));
+            });
+        }
+
         async function updateCategoryCounts() {
-            const categories = ['acceso', 'gramatica', 'comunidad', 'recursos', 'tecnico', 'metodo'];
-            for (const cat of categories) {
-                const { count, error } = await supabaseClient
+            try {
+                const { data, error } = await supabaseClient
                     .from('consultas')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('category', cat);
-
-                if (!error) {
-                    const el = document.querySelector(`.cat-count[data-cat="${cat}"]`);
-                    if (el) el.textContent = count || 0;
-                }
+                    .select('category');
+                if (error) throw error;
+                const counts = {};
+                data.forEach(r => { counts[r.category] = (counts[r.category] || 0) + 1; });
+                document.querySelectorAll('.cat-count').forEach(el => {
+                    el.textContent = counts[el.dataset.cat] || 0;
+                });
+            } catch (e) {
+                console.warn('count error', e);
             }
         }
 
-        // Initialize Feed
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFeed(false);
+        function highlightMatch(text, query) {
+            if (!text || !query) return text;
+            const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return text.replace(new RegExp(escaped, 'gi'), m => `<mark>${m}</mark>`);
+        }
+
+        function searchResultHTML(post, query) {
+            const cat = CAT_BY_ID[post.category] || { name: post.category, color: 'gray' };
+            const titleHL = highlightMatch(escapeHTML(post.title || ''), query);
+            const stripped = (post.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            const snippet = stripped.length > 180 ? stripped.slice(0, 180) + '…' : stripped;
+            const snippetHL = highlightMatch(escapeHTML(snippet), query);
+
+            const badge = post.resolved
+                ? `<span class="inline-flex items-center text-green-700 bg-green-50 border border-green-100 px-2 py-0.5 rounded-full text-[10px] font-bold"><i class="ph-fill ph-check-circle mr-1"></i>Resuelta</span>`
+                : `<span class="inline-flex items-center text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full text-[10px] font-bold"><i class="ph-fill ph-clock mr-1"></i>Pendiente</span>`;
+
+            return `
+                <article data-post-id="${escapeHTML(post.id)}" class="post-card bg-white rounded-xl p-4 border border-gray-100 hover:border-brand-300 transition-colors cursor-pointer">
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                        ${badge}
+                        <span class="text-[10px] font-medium uppercase tracking-wide text-${cat.color}-600">${escapeHTML(cat.name)}</span>
+                    </div>
+                    <h3 class="font-bold text-gray-900 text-sm mb-1">${titleHL}</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">${snippetHL}</p>
+                </article>
+            `;
+        }
+
+        async function runSearch(query) {
+            const resultsBox = document.getElementById('searchResults');
+            const emptyBox = document.getElementById('searchEmpty');
+            const loading = document.getElementById('searchLoading');
+
+            if (!query || query.trim().length < 2) {
+                resultsBox.classList.add('hidden');
+                emptyBox.classList.add('hidden');
+                loading.classList.add('hidden');
+                document.getElementById('searchClear').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('searchClear').classList.remove('hidden');
+            loading.classList.remove('hidden');
+            resultsBox.classList.add('hidden');
+            emptyBox.classList.add('hidden');
+
+            try {
+                const { data, error } = await supabaseClient
+                    .rpc('search_consultas', { query_text: query });
+                if (error) throw error;
+
+                loading.classList.add('hidden');
+
+                if (!data || data.length === 0) {
+                    emptyBox.classList.remove('hidden');
+                    return;
+                }
+
+                data.forEach(p => postsCache.set(p.id, p));
+                resultsBox.innerHTML = `
+                    <div class="text-xs text-gray-500 px-1">
+                        <i class="ph ph-list-magnifying-glass"></i> ${data.length} resultado${data.length === 1 ? '' : 's'}
+                    </div>
+                    ${data.map(p => searchResultHTML(p, query)).join('')}
+                `;
+                resultsBox.classList.remove('hidden');
+            } catch (e) {
+                console.error(e);
+                loading.classList.add('hidden');
+                resultsBox.innerHTML = `<p class="text-sm text-red-600 px-1">Error al buscar: ${escapeHTML(e.message || '')}</p>`;
+                resultsBox.classList.remove('hidden');
+            }
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            runSearch('');
+            input.focus();
+        }
+
+        async function handleDeeplink() {
+            const params = new URLSearchParams(location.search);
+            const id = params.get('id');
+            if (!id) return;
+            if (postsCache.has(id)) {
+                openViewModal(postsCache.get(id));
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient
+                    .from('consultas')
+                    .select('id,title,content,category,author_name,created_at,resolved,respuesta_nawar')
+                    .eq('id', id)
+                    .maybeSingle();
+                if (error) throw error;
+                if (data) {
+                    postsCache.set(data.id, data);
+                    openViewModal(data);
+                }
+            } catch (e) {
+                console.warn('Deeplink fetch failed', e);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.post-card');
+            if (!card) return;
+            const id = card.dataset.postId;
+            const post = postsCache.get(id);
+            if (post) openViewModal(post);
         });
 
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            if (!viewModal.classList.contains('hidden')) closeViewModal();
+            else if (!modal.classList.contains('hidden')) closeModal();
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadIdentityFromURL();
+            buildCategoriesNav();
+
+            const input = document.getElementById('searchInput');
+            input.addEventListener('input', () => {
+                clearTimeout(searchDebounceTimer);
+                const q = input.value.trim();
+                searchDebounceTimer = setTimeout(() => runSearch(q), 250);
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') clearSearch();
+            });
+
+            await loadFeed(false);
+            handleDeeplink();
+        });
     </script>
 </body>
 
