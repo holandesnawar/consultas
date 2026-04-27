@@ -101,25 +101,57 @@
     <!-- LOGIN VIEW -->
     <section id="loginView" class="hidden flex-1 flex items-center justify-center p-6">
         <div class="bg-white rounded-2xl shadow-soft border border-gray-100 p-8 w-full max-w-md">
-            <div class="flex justify-center mb-5">
-                <div class="w-16 h-16 rounded-2xl bg-brand-50 flex items-center justify-center">
-                    <i class="ph-fill ph-key text-brand-600 text-3xl"></i>
-                </div>
-            </div>
-            <h2 class="text-xl font-extrabold text-gray-900 text-center mb-1">Acceso del equipo</h2>
-            <p class="text-sm text-gray-600 text-center mb-6">
-                Te enviaremos un enlace mágico al correo. Solo emails autorizados.
-            </p>
 
-            <form id="loginForm" onsubmit="sendMagicLink(event)">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5" for="loginEmail">Tu email</label>
-                <input id="loginEmail" type="email" required placeholder="holandesnawar@gmail.com"
-                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" />
-                <button id="loginBtn" type="submit"
-                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl shadow-floating transition-all flex items-center justify-center gap-2">
-                    <i class="ph ph-paper-plane-right"></i> Enviar enlace
+            <!-- STEP 1: Pedir email -->
+            <div id="step1Email">
+                <div class="flex justify-center mb-5">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-50 flex items-center justify-center">
+                        <i class="ph-fill ph-key text-brand-600 text-3xl"></i>
+                    </div>
+                </div>
+                <h2 class="text-xl font-extrabold text-gray-900 text-center mb-1">Acceso del equipo</h2>
+                <p class="text-sm text-gray-600 text-center mb-6">
+                    Te enviaremos un código de 6 dígitos al correo. Solo emails autorizados.
+                </p>
+
+                <form id="loginForm" onsubmit="sendMagicLink(event)">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5" for="loginEmail">Tu email</label>
+                    <input id="loginEmail" type="email" required placeholder="holandesnawar@gmail.com"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" />
+                    <button id="loginBtn" type="submit"
+                        class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl shadow-floating transition-all flex items-center justify-center gap-2">
+                        <i class="ph ph-paper-plane-right"></i> Enviar código
+                    </button>
+                </form>
+            </div>
+
+            <!-- STEP 2: Verificar código -->
+            <div id="step2Verify" class="hidden">
+                <div class="flex justify-center mb-5">
+                    <div class="w-16 h-16 rounded-2xl bg-brand-50 flex items-center justify-center">
+                        <i class="ph-fill ph-envelope-open text-brand-600 text-3xl"></i>
+                    </div>
+                </div>
+                <h2 class="text-xl font-extrabold text-gray-900 text-center mb-1">Revisa tu correo</h2>
+                <p class="text-sm text-gray-600 text-center mb-6">
+                    Hemos enviado un código de 6 dígitos a <strong id="step2Email" class="text-gray-800"></strong>.
+                </p>
+
+                <form id="verifyForm" onsubmit="verifyCode(event)">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5" for="otpCode">Código</label>
+                    <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required
+                        autocomplete="one-time-code" placeholder="123456"
+                        class="w-full border border-gray-200 rounded-xl px-4 py-3 mb-4 text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" />
+                    <button id="verifyBtn" type="submit"
+                        class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl shadow-floating transition-all flex items-center justify-center gap-2">
+                        <i class="ph ph-sign-in"></i> Entrar
+                    </button>
+                </form>
+
+                <button onclick="backToEmail()" class="w-full mt-3 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+                    ← Usar otro email
                 </button>
-            </form>
+            </div>
 
             <div id="loginMessage" class="hidden mt-4 p-3 rounded-xl text-sm"></div>
         </div>
@@ -350,6 +382,8 @@
         }
 
         // ============ AUTH ============
+        let pendingEmail = null;
+
         async function sendMagicLink(event) {
             event?.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
@@ -357,16 +391,19 @@
             const original = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin"></i> Enviando…';
+            document.getElementById('loginMessage').classList.add('hidden');
 
             try {
                 const { error } = await supabaseClient.auth.signInWithOtp({
                     email,
-                    options: {
-                        emailRedirectTo: window.location.href.split('#')[0].split('?')[0],
-                    }
+                    options: { shouldCreateUser: true }
                 });
                 if (error) throw error;
-                showLoginMessage('Listo. Revisa tu correo para entrar.');
+                pendingEmail = email;
+                document.getElementById('step2Email').textContent = email;
+                document.getElementById('step1Email').classList.add('hidden');
+                document.getElementById('step2Verify').classList.remove('hidden');
+                setTimeout(() => document.getElementById('otpCode').focus(), 100);
             } catch (e) {
                 console.error(e);
                 showLoginMessage('Error: ' + (e.message || e), true);
@@ -374,6 +411,39 @@
                 btn.disabled = false;
                 btn.innerHTML = original;
             }
+        }
+
+        async function verifyCode(event) {
+            event?.preventDefault();
+            const token = document.getElementById('otpCode').value.trim();
+            const btn = document.getElementById('verifyBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin"></i> Verificando…';
+            document.getElementById('loginMessage').classList.add('hidden');
+
+            try {
+                const { error } = await supabaseClient.auth.verifyOtp({
+                    email: pendingEmail,
+                    token,
+                    type: 'email',
+                });
+                if (error) throw error;
+                // onAuthStateChange se encarga de routear a admin view
+            } catch (e) {
+                console.error(e);
+                showLoginMessage('Código incorrecto o caducado: ' + (e.message || e), true);
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        function backToEmail() {
+            pendingEmail = null;
+            document.getElementById('step2Verify').classList.add('hidden');
+            document.getElementById('step1Email').classList.remove('hidden');
+            document.getElementById('otpCode').value = '';
+            document.getElementById('loginMessage').classList.add('hidden');
         }
 
         async function logout() {
