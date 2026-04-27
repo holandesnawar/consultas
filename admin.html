@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!-- admin v1 -->
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Nawar — Consultas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 10px rgba(0,0,0,0.02), 0 10px 25px rgba(0,0,0,0.03)',
+                        'floating': '0 10px 40px -10px rgba(37,99,235,0.15)',
+                    }
+                }
+            },
+            safelist: [
+                'bg-blue-400','bg-blue-500','bg-blue-50','text-blue-600',
+                'bg-green-400','bg-green-500','bg-green-50','text-green-600',
+                'bg-purple-400','bg-purple-500','bg-purple-50','text-purple-600',
+                'bg-yellow-400','bg-yellow-500','bg-yellow-50','text-yellow-600',
+                'bg-red-400','bg-red-500','bg-red-50','text-red-600',
+                'bg-orange-400','bg-orange-500','bg-orange-50','text-orange-600',
+            ]
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .post-content-display ul { list-style-type: disc; padding-left: 1.5rem; margin: .5rem 0; }
+        .post-content-display ol { list-style-type: decimal; padding-left: 1.5rem; margin: .5rem 0; }
+        .post-content-display b, .post-content-display strong { font-weight: bold; }
+        .post-content-display i, .post-content-display em { font-style: italic; }
+        .post-content-display u { text-decoration: underline; }
+
+        [contenteditable][placeholder]:empty:before {
+            content: attr(placeholder);
+            color: #9ca3af; pointer-events: none; display: block;
+        }
+
+        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 40px, #f1f5f9 80px);
+            background-size: 1000px 100%;
+            animation: shimmer 1.6s infinite linear;
+            border-radius: 8px;
+        }
+
+        .consulta-item.active {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- TOP BAR -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center">
+                    <i class="ph-fill ph-shield-check text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-gray-900 leading-tight">Panel Nawar</h1>
+                    <p class="text-xs text-gray-500 leading-tight">Gestión de consultas</p>
+                </div>
+            </div>
+            <div id="userBox" class="hidden flex items-center gap-3">
+                <span id="userEmailLabel" class="text-sm text-gray-600 hidden sm:inline"></span>
+                <button onclick="logout()" aria-label="Cerrar sesión"
+                    class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">
+                    <i class="ph ph-sign-out"></i>
+                    <span class="hidden sm:inline">Salir</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- LOGIN VIEW -->
+    <section id="loginView" class="hidden flex-1 flex items-center justify-center p-6">
+        <div class="bg-white rounded-2xl shadow-soft border border-gray-100 p-8 w-full max-w-md">
+            <div class="flex justify-center mb-5">
+                <div class="w-16 h-16 rounded-2xl bg-brand-50 flex items-center justify-center">
+                    <i class="ph-fill ph-key text-brand-600 text-3xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-extrabold text-gray-900 text-center mb-1">Acceso del equipo</h2>
+            <p class="text-sm text-gray-600 text-center mb-6">
+                Te enviaremos un enlace mágico al correo. Solo emails autorizados.
+            </p>
+
+            <form id="loginForm" onsubmit="sendMagicLink(event)">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5" for="loginEmail">Tu email</label>
+                <input id="loginEmail" type="email" required placeholder="holandesnawar@gmail.com"
+                    class="w-full border border-gray-200 rounded-xl px-4 py-2.5 mb-4 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" />
+                <button id="loginBtn" type="submit"
+                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl shadow-floating transition-all flex items-center justify-center gap-2">
+                    <i class="ph ph-paper-plane-right"></i> Enviar enlace
+                </button>
+            </form>
+
+            <div id="loginMessage" class="hidden mt-4 p-3 rounded-xl text-sm"></div>
+        </div>
+    </section>
+
+    <!-- NOT-ADMIN VIEW -->
+    <section id="notAdminView" class="hidden flex-1 flex items-center justify-center p-6">
+        <div class="bg-white rounded-2xl shadow-soft border border-gray-100 p-8 w-full max-w-md text-center">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-red-50 flex items-center justify-center mb-4">
+                <i class="ph-fill ph-warning-octagon text-red-600 text-3xl"></i>
+            </div>
+            <h2 class="text-xl font-extrabold text-gray-900 mb-1">Sin permisos</h2>
+            <p class="text-sm text-gray-600 mb-5">
+                Tu cuenta (<span id="notAdminEmail" class="font-medium text-gray-800"></span>)
+                no está en la lista de administradores. Si es un error, contacta con el equipo.
+            </p>
+            <button onclick="logout()" class="text-brand-600 font-medium hover:underline">Cerrar sesión</button>
+        </div>
+    </section>
+
+    <!-- ADMIN VIEW -->
+    <section id="adminView" class="hidden flex-1">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+
+            <!-- Tabs + stats -->
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                <div class="flex items-center bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
+                    <button id="tabPending" onclick="switchTab('pending')"
+                        class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-brand-600 text-white">
+                        <i class="ph-fill ph-clock"></i>
+                        Pendientes
+                        <span id="countPending" class="bg-white/20 text-white px-1.5 py-0.5 rounded text-xs">0</span>
+                    </button>
+                    <button id="tabResolved" onclick="switchTab('resolved')"
+                        class="tab-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50">
+                        <i class="ph-fill ph-check-circle"></i>
+                        Resueltas
+                        <span id="countResolved" class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs">0</span>
+                    </button>
+                </div>
+                <button onclick="loadConsultas()"
+                    class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="ph ph-arrows-clockwise"></i> Actualizar
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- LIST -->
+                <div class="lg:col-span-1 space-y-3">
+                    <div id="consultasList" class="space-y-3"></div>
+                    <div id="consultasEmpty" class="hidden bg-white rounded-2xl border border-dashed border-gray-200 p-8 text-center">
+                        <i class="ph ph-coffee text-4xl text-gray-300 mb-2"></i>
+                        <p class="text-sm text-gray-500">Sin consultas en este filtro.</p>
+                    </div>
+                    <div id="consultasSkeleton" class="space-y-3">
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100"><div class="skeleton h-3 w-1/4 mb-2"></div><div class="skeleton h-4 w-3/4 mb-1"></div><div class="skeleton h-3 w-2/3"></div></div>
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100"><div class="skeleton h-3 w-1/4 mb-2"></div><div class="skeleton h-4 w-3/4 mb-1"></div><div class="skeleton h-3 w-2/3"></div></div>
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100"><div class="skeleton h-3 w-1/4 mb-2"></div><div class="skeleton h-4 w-3/4 mb-1"></div><div class="skeleton h-3 w-2/3"></div></div>
+                    </div>
+                </div>
+
+                <!-- DETAIL -->
+                <div class="lg:col-span-2">
+                    <!-- Detail empty state -->
+                    <div id="detailEmpty" class="bg-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
+                        <i class="ph ph-arrow-left text-3xl text-gray-300 mb-3"></i>
+                        <h3 class="font-bold text-gray-900 mb-1">Selecciona una consulta</h3>
+                        <p class="text-sm text-gray-500">Elige una de la lista para verla y responder.</p>
+                    </div>
+
+                    <!-- Detail content -->
+                    <div id="detailContent" class="hidden bg-white rounded-2xl shadow-soft border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-100">
+                            <div class="flex items-start justify-between gap-3 mb-4">
+                                <div id="detailBadge"></div>
+                                <button onclick="closeDetail()" aria-label="Cerrar"
+                                    class="text-gray-400 hover:text-gray-600 p-1 lg:hidden">
+                                    <i class="ph ph-x text-xl"></i>
+                                </button>
+                            </div>
+                            <h2 id="detailTitle" class="text-xl font-extrabold text-gray-900 leading-tight mb-3"></h2>
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
+                                <span class="flex items-center gap-1"><i class="ph ph-user"></i> <span id="detailAuthor"></span></span>
+                                <span class="flex items-center gap-1"><i class="ph ph-envelope"></i> <span id="detailEmail"></span></span>
+                                <span class="flex items-center gap-1"><i class="ph ph-clock"></i> <span id="detailDate"></span></span>
+                                <span id="detailCategory" class="font-medium uppercase tracking-wider"></span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 border-b border-gray-100">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Pregunta</h4>
+                            <div id="detailContentBody" class="text-gray-800 leading-relaxed post-content-display break-words"></div>
+                        </div>
+
+                        <!-- Existing answer (read-only when resolved) -->
+                        <div id="existingAnswerBlock" class="hidden p-6 border-b border-gray-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Respuesta publicada</h4>
+                                <button onclick="enableEditMode()" class="text-xs text-brand-600 font-bold hover:underline">
+                                    <i class="ph ph-pencil-simple"></i> Editar respuesta
+                                </button>
+                            </div>
+                            <div id="existingAnswerBody" class="bg-brand-50 border border-brand-100 rounded-xl p-4 text-gray-800 leading-relaxed post-content-display break-words"></div>
+                        </div>
+
+                        <!-- Editor -->
+                        <div id="editorBlock" class="p-6 bg-gray-50/50">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Tu respuesta</h4>
+                            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 transition-colors">
+                                <div class="flex items-center gap-1 bg-gray-50 border-b border-gray-200 px-3 py-2">
+                                    <button type="button" onclick="formatText('bold')" aria-label="Negrita"
+                                        class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-b"></i></button>
+                                    <button type="button" onclick="formatText('italic')" aria-label="Cursiva"
+                                        class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-italic"></i></button>
+                                    <button type="button" onclick="formatText('underline')" aria-label="Subrayado"
+                                        class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-text-underline"></i></button>
+                                    <div class="w-px h-4 bg-gray-300 mx-1"></div>
+                                    <button type="button" onclick="formatText('insertOrderedList')" aria-label="Lista numerada"
+                                        class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-numbers"></i></button>
+                                    <button type="button" onclick="formatText('insertUnorderedList')" aria-label="Lista de viñetas"
+                                        class="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded"><i class="ph ph-list-bullets"></i></button>
+                                </div>
+                                <div id="replyEditor" contenteditable="true"
+                                    class="w-full px-4 py-3 text-gray-900 focus:outline-none min-h-[180px] max-h-[400px] overflow-y-auto bg-white"
+                                    placeholder="Escribe tu respuesta. Será visible públicamente y enviaremos un email al alumno avisándole."></div>
+                            </div>
+
+                            <div id="editorMessage" class="hidden mt-3 p-3 rounded-xl text-sm"></div>
+
+                            <div class="mt-4 flex flex-wrap items-center justify-end gap-3">
+                                <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">
+                                    Cancelar
+                                </button>
+                                <button id="publishBtn" onclick="publishReply()"
+                                    class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating transition-all flex items-center gap-2">
+                                    <i class="ph ph-paper-plane-right"></i>
+                                    <span>Publicar respuesta y resolver</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://alifjhqjmedstkafnrmp.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsaWZqaHFqbWVkc3RrYWZucm1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTA4MTUsImV4cCI6MjA4Nzg2NjgxNX0.Gz0tMmEy1rcNdjaH7pYkoySMm3PBczmgCuaWobMdOtQ';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const CATEGORY_DATA = [
+            { id: 'acceso',    name: 'Acceso y cuenta',     color: 'blue'   },
+            { id: 'gramatica', name: 'Gramática',           color: 'green'  },
+            { id: 'comunidad', name: 'Comunidad',           color: 'purple' },
+            { id: 'recursos',  name: 'Recursos',            color: 'yellow' },
+            { id: 'tecnico',   name: 'Problemas técnicos',  color: 'red'    },
+            { id: 'metodo',    name: 'Método y Estudio',    color: 'orange' },
+        ];
+        const CAT_BY_ID = Object.fromEntries(CATEGORY_DATA.map(c => [c.id, c]));
+
+        let currentTab = 'pending';
+        let consultas = [];
+        let selectedConsulta = null;
+        let editingExisting = false;
+
+        const escapeHTML = (str = '') => String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        const sanitizeHTML = (html = '') => DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['b','strong','i','em','u','br','p','div','ul','ol','li','span','a'],
+            ALLOWED_ATTR: ['href','target','rel']
+        });
+
+        function timeAgo(dateString) {
+            if (!dateString) return 'hace un momento';
+            const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+            if (seconds < 60) return 'hace un momento';
+            const intervals = [
+                { unit: 'año', s: 31536000 }, { unit: 'mes', s: 2592000 },
+                { unit: 'día', s: 86400 }, { unit: 'hora', s: 3600 }, { unit: 'min', s: 60 },
+            ];
+            for (const i of intervals) {
+                const v = Math.floor(seconds / i.s);
+                if (v >= 1) {
+                    const plural = v > 1 ? (i.unit === 'mes' ? 'meses' : i.unit + 's') : i.unit;
+                    return `hace ${v} ${plural}`;
+                }
+            }
+            return 'hace un momento';
+        }
+
+        function formatDateLong(dateString) {
+            if (!dateString) return '';
+            const d = new Date(dateString);
+            return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showToast(msg, ms = 2400) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.remove('hidden');
+            clearTimeout(showToast._tid);
+            showToast._tid = setTimeout(() => t.classList.add('hidden'), ms);
+        }
+
+        function showLoginMessage(text, isError = false) {
+            const box = document.getElementById('loginMessage');
+            box.textContent = text;
+            box.className = `mt-4 p-3 rounded-xl text-sm ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
+            box.classList.remove('hidden');
+        }
+
+        function showEditorMessage(text, isError = false) {
+            const box = document.getElementById('editorMessage');
+            box.textContent = text;
+            box.className = `mt-3 p-3 rounded-xl text-sm ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`;
+            box.classList.remove('hidden');
+        }
+
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('replyEditor').focus();
+        }
+
+        // ============ AUTH ============
+        async function sendMagicLink(event) {
+            event?.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const btn = document.getElementById('loginBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin"></i> Enviando…';
+
+            try {
+                const { error } = await supabaseClient.auth.signInWithOtp({
+                    email,
+                    options: {
+                        emailRedirectTo: window.location.href.split('#')[0].split('?')[0],
+                    }
+                });
+                if (error) throw error;
+                showLoginMessage('Listo. Revisa tu correo para entrar.');
+            } catch (e) {
+                console.error(e);
+                showLoginMessage('Error: ' + (e.message || e), true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        async function checkSessionAndRoute() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const loginView = document.getElementById('loginView');
+            const adminView = document.getElementById('adminView');
+            const notAdminView = document.getElementById('notAdminView');
+            const userBox = document.getElementById('userBox');
+
+            // Hide all
+            loginView.classList.add('hidden');
+            adminView.classList.add('hidden');
+            notAdminView.classList.add('hidden');
+
+            if (!session) {
+                loginView.classList.remove('hidden');
+                userBox.classList.add('hidden');
+                return;
+            }
+
+            // Verificar admin
+            const { data: isAdminVal, error } = await supabaseClient.rpc('is_admin');
+            if (error || !isAdminVal) {
+                document.getElementById('notAdminEmail').textContent = session.user.email || '';
+                notAdminView.classList.remove('hidden');
+                userBox.classList.add('hidden');
+                return;
+            }
+
+            // OK
+            userBox.classList.remove('hidden');
+            document.getElementById('userEmailLabel').textContent = session.user.email || '';
+            adminView.classList.remove('hidden');
+            await loadConsultas();
+        }
+
+        // ============ CONSULTAS ============
+        async function loadConsultas() {
+            const list = document.getElementById('consultasList');
+            const empty = document.getElementById('consultasEmpty');
+            const skel = document.getElementById('consultasSkeleton');
+
+            list.classList.add('hidden');
+            empty.classList.add('hidden');
+            skel.classList.remove('hidden');
+
+            try {
+                const isPending = currentTab === 'pending';
+                const { data, error } = await supabaseClient
+                    .from('consultas')
+                    .select('*')
+                    .eq('resolved', !isPending)
+                    .order('created_at', { ascending: isPending });
+                if (error) throw error;
+
+                consultas = data || [];
+
+                // Update counts (con queries head)
+                const [{ count: cP }, { count: cR }] = await Promise.all([
+                    supabaseClient.from('consultas').select('*', { count: 'exact', head: true }).eq('resolved', false),
+                    supabaseClient.from('consultas').select('*', { count: 'exact', head: true }).eq('resolved', true),
+                ]);
+                document.getElementById('countPending').textContent = cP ?? 0;
+                document.getElementById('countResolved').textContent = cR ?? 0;
+
+                renderList();
+
+                skel.classList.add('hidden');
+                if (consultas.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    list.classList.remove('hidden');
+                }
+            } catch (e) {
+                console.error(e);
+                skel.classList.add('hidden');
+                list.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">Error: ${escapeHTML(e.message || '')}</div>`;
+                list.classList.remove('hidden');
+            }
+        }
+
+        function renderList() {
+            const list = document.getElementById('consultasList');
+            list.innerHTML = consultas.map(c => {
+                const cat = CAT_BY_ID[c.category] || { name: c.category || '', color: 'gray' };
+                return `
+                    <article data-id="${escapeHTML(c.id)}" class="consulta-item bg-white rounded-xl p-4 border border-gray-200 hover:border-brand-300 transition-colors cursor-pointer">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="inline-flex items-center gap-1 text-${cat.color}-600 bg-${cat.color}-50 border border-${cat.color}-100 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide">
+                                <span class="w-1.5 h-1.5 rounded-full bg-${cat.color}-500"></span>
+                                ${escapeHTML(cat.name)}
+                            </span>
+                            <span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>
+                        </div>
+                        <h3 class="font-bold text-sm text-gray-900 mb-1 line-clamp-2">${escapeHTML(c.title || 'Sin título')}</h3>
+                        <p class="text-xs text-gray-500 truncate"><i class="ph ph-user text-gray-400"></i> ${escapeHTML(c.author_name || 'Anónimo')}</p>
+                    </article>
+                `;
+            }).join('');
+
+            list.querySelectorAll('.consulta-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = item.dataset.id;
+                    const c = consultas.find(x => x.id === id);
+                    if (c) selectConsulta(c, item);
+                });
+            });
+        }
+
+        function selectConsulta(c, itemEl) {
+            selectedConsulta = c;
+            editingExisting = false;
+
+            document.querySelectorAll('.consulta-item').forEach(el => el.classList.remove('active'));
+            itemEl?.classList.add('active');
+
+            document.getElementById('detailEmpty').classList.add('hidden');
+            document.getElementById('detailContent').classList.remove('hidden');
+
+            const cat = CAT_BY_ID[c.category] || { name: c.category, color: 'gray' };
+            document.getElementById('detailBadge').innerHTML = c.resolved
+                ? `<span class="inline-flex items-center text-green-700 bg-green-50 border border-green-100 px-3 py-1 rounded-full text-xs font-bold"><i class="ph-fill ph-check-circle mr-1"></i>Resuelta</span>`
+                : `<span class="inline-flex items-center text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full text-xs font-bold"><i class="ph-fill ph-clock mr-1"></i>Pendiente</span>`;
+
+            document.getElementById('detailTitle').textContent = c.title || 'Sin título';
+            document.getElementById('detailAuthor').textContent = c.author_name || 'Anónimo';
+            document.getElementById('detailEmail').textContent = c.author_email || '—';
+            document.getElementById('detailDate').textContent = formatDateLong(c.created_at);
+            const catEl = document.getElementById('detailCategory');
+            catEl.textContent = cat.name;
+            catEl.className = `font-medium uppercase tracking-wider text-${cat.color}-600`;
+
+            document.getElementById('detailContentBody').innerHTML = sanitizeHTML(c.content || '');
+
+            const existingBlock = document.getElementById('existingAnswerBlock');
+            const editorBlock = document.getElementById('editorBlock');
+            const editor = document.getElementById('replyEditor');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+            const publishBtn = document.getElementById('publishBtn');
+            const editorMessage = document.getElementById('editorMessage');
+
+            editorMessage.classList.add('hidden');
+
+            if (c.respuesta_nawar) {
+                existingBlock.classList.remove('hidden');
+                document.getElementById('existingAnswerBody').innerHTML = sanitizeHTML(c.respuesta_nawar);
+                editorBlock.classList.add('hidden');
+                editor.innerHTML = '';
+                cancelBtn.classList.add('hidden');
+                publishBtn.innerHTML = `<i class="ph ph-paper-plane-right"></i> <span>Publicar respuesta y resolver</span>`;
+            } else {
+                existingBlock.classList.add('hidden');
+                editorBlock.classList.remove('hidden');
+                editor.innerHTML = '';
+                cancelBtn.classList.add('hidden');
+                publishBtn.innerHTML = `<i class="ph ph-paper-plane-right"></i> <span>Publicar respuesta y resolver</span>`;
+                setTimeout(() => editor.focus(), 100);
+            }
+        }
+
+        function enableEditMode() {
+            if (!selectedConsulta) return;
+            editingExisting = true;
+            document.getElementById('existingAnswerBlock').classList.add('hidden');
+            const editorBlock = document.getElementById('editorBlock');
+            editorBlock.classList.remove('hidden');
+            const editor = document.getElementById('replyEditor');
+            editor.innerHTML = sanitizeHTML(selectedConsulta.respuesta_nawar || '');
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('publishBtn').innerHTML = `<i class="ph ph-floppy-disk"></i> <span>Guardar cambios</span>`;
+            editor.focus();
+        }
+
+        function cancelEdit() {
+            if (!selectedConsulta) return;
+            editingExisting = false;
+            const editor = document.getElementById('replyEditor');
+            editor.innerHTML = '';
+            document.getElementById('editorBlock').classList.add('hidden');
+            document.getElementById('existingAnswerBlock').classList.remove('hidden');
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('editorMessage').classList.add('hidden');
+        }
+
+        function closeDetail() {
+            selectedConsulta = null;
+            document.getElementById('detailContent').classList.add('hidden');
+            document.getElementById('detailEmpty').classList.remove('hidden');
+            document.querySelectorAll('.consulta-item').forEach(el => el.classList.remove('active'));
+        }
+
+        async function publishReply() {
+            if (!selectedConsulta) return;
+            const btn = document.getElementById('publishBtn');
+            const editor = document.getElementById('replyEditor');
+            const raw = editor.innerHTML.trim();
+            const cleanReply = sanitizeHTML(raw);
+
+            if (!cleanReply || cleanReply === '<br>' || cleanReply === '<div><br></div>') {
+                showEditorMessage('La respuesta está vacía.', true);
+                return;
+            }
+
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin"></i> Guardando…';
+
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                const updates = {
+                    respuesta_nawar: cleanReply,
+                    resolved: true,
+                };
+                // resolved_at y resolved_by solo si las columnas existen — incluimos sin temor: la migración las añadió
+                updates.resolved_at = new Date().toISOString();
+                updates.resolved_by = session?.user?.email || null;
+
+                const { error } = await supabaseClient
+                    .from('consultas')
+                    .update(updates)
+                    .eq('id', selectedConsulta.id);
+                if (error) throw error;
+
+                showToast(editingExisting ? 'Respuesta actualizada' : 'Consulta resuelta');
+                editingExisting = false;
+                await loadConsultas();
+                closeDetail();
+            } catch (e) {
+                console.error(e);
+                showEditorMessage('Error al guardar: ' + (e.message || e), true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        // ============ TABS ============
+        function switchTab(tab) {
+            currentTab = tab;
+            const pendBtn = document.getElementById('tabPending');
+            const resBtn = document.getElementById('tabResolved');
+            const pendCnt = document.getElementById('countPending');
+            const resCnt = document.getElementById('countResolved');
+
+            if (tab === 'pending') {
+                pendBtn.classList.add('bg-brand-600', 'text-white');
+                pendBtn.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                pendCnt.classList.add('bg-white/20', 'text-white');
+                pendCnt.classList.remove('bg-gray-100', 'text-gray-600');
+
+                resBtn.classList.remove('bg-brand-600', 'text-white');
+                resBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
+                resCnt.classList.remove('bg-white/20', 'text-white');
+                resCnt.classList.add('bg-gray-100', 'text-gray-600');
+            } else {
+                resBtn.classList.add('bg-brand-600', 'text-white');
+                resBtn.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                resCnt.classList.add('bg-white/20', 'text-white');
+                resCnt.classList.remove('bg-gray-100', 'text-gray-600');
+
+                pendBtn.classList.remove('bg-brand-600', 'text-white');
+                pendBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
+                pendCnt.classList.remove('bg-white/20', 'text-white');
+                pendCnt.classList.add('bg-gray-100', 'text-gray-600');
+            }
+
+            closeDetail();
+            loadConsultas();
+        }
+
+        // ============ INIT ============
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSessionAndRoute();
+        });
+
+        // Re-check on auth state change (magic link redirect)
+        supabaseClient.auth.onAuthStateChange((event) => {
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+                checkSessionAndRoute();
+            }
+        });
+    </script>
+</body>
+
+</html>
