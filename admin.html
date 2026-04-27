@@ -422,20 +422,27 @@
             btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin"></i> Verificando…';
             document.getElementById('loginMessage').classList.add('hidden');
 
-            try {
-                const { error } = await supabaseClient.auth.verifyOtp({
-                    email: pendingEmail,
-                    token,
-                    type: 'email',
-                });
-                if (error) throw error;
-                // onAuthStateChange se encarga de routear a admin view
-            } catch (e) {
-                console.error(e);
-                showLoginMessage('Código incorrecto o caducado: ' + (e.message || e), true);
-                btn.disabled = false;
-                btn.innerHTML = original;
+            // Prueba primero 'email' (magic link OTP), luego 'signup' (primer login)
+            let lastError = null;
+            for (const type of ['email', 'signup']) {
+                try {
+                    const { data, error } = await supabaseClient.auth.verifyOtp({
+                        email: pendingEmail,
+                        token,
+                        type,
+                    });
+                    if (!error && data?.session) {
+                        return; // success
+                    }
+                    lastError = error;
+                } catch (e) {
+                    lastError = e;
+                }
             }
+            console.error(lastError);
+            showLoginMessage('Código incorrecto o caducado. Si tu email tiene un enlace dentro, asegúrate de modificar la plantilla "Magic Link" en Supabase para que solo contenga el código. Detalle: ' + (lastError?.message || lastError || ''), true);
+            btn.disabled = false;
+            btn.innerHTML = original;
         }
 
         function backToEmail() {
