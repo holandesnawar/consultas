@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
@@ -18,16 +18,26 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'system-ui', 'sans-serif'],
+                    },
                     colors: {
+                        // Brand Nawar: morado profundo + azul + azul claro
                         brand: {
-                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                            50:  '#F0F5FF',
+                            100: '#DDE6F5',
+                            200: '#bfdbfe',
+                            300: '#4da3ff',  // blue-light
+                            500: '#025dc7',  // blue secondary
+                            600: '#1D0084',  // primary brand (morado violáceo)
+                            700: '#150061',
+                            900: '#0C0C1E',
                         }
                     },
                     boxShadow: {
                         'soft': '0 2px 10px rgba(0,0,0,0.02), 0 10px 25px rgba(0,0,0,0.03)',
-                        'floating': '0 10px 40px -10px rgba(37,99,235,0.15)',
+                        'floating': '0 8px 32px rgba(29,0,132,0.12)',
                     }
                 }
             },
@@ -42,7 +52,18 @@
         }
     </script>
     <style>
-        body { background-color: #f8fafc; color: #0f172a; }
+        body { background-color: #ffffff; color: #0C0C1E; font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Poppins', system-ui, sans-serif; }
+
+        /* Pattern de puntos para hero (estilo brand Nawar) */
+        .dots-dark {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        .dots-light {
+            background-image: radial-gradient(circle, rgba(29,0,132,0.06) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -188,30 +209,33 @@
         <!-- Main Feed -->
         <main class="flex-1 w-full max-w-3xl">
 
-            <!-- Hero Buscador -->
+            <!-- Hero Buscador (estilo marca Nawar) -->
             <section id="searchHero"
-                class="relative bg-gradient-to-br from-brand-50 via-white to-brand-50/50 border border-brand-100 rounded-2xl p-6 md:p-8 mb-6 overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-40 h-40 bg-brand-500/5 rounded-full blur-3xl"></div>
-                <div class="relative">
-                    <div class="flex items-start gap-3 mb-3">
-                        <div class="hidden sm:flex w-10 h-10 rounded-xl bg-brand-600 items-center justify-center flex-shrink-0">
-                            <i class="ph-fill ph-magnifying-glass text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
-                                Antes de preguntar, busca aquí
-                            </h1>
-                            <p class="text-sm text-gray-600 mt-0.5">
-                                Quizás tu duda ya está resuelta por nuestro equipo.
-                            </p>
-                        </div>
-                    </div>
+                class="relative bg-brand-600 rounded-2xl p-6 md:p-8 mb-6 overflow-hidden">
+                <div aria-hidden class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -top-10 -right-10 w-[400px] h-[300px]"
+                        style="background: radial-gradient(ellipse at center, rgba(11,109,240,0.30) 0%, transparent 65%);"></div>
+                </div>
+                <div aria-hidden class="absolute inset-0 dots-dark pointer-events-none"></div>
 
-                    <div class="relative mt-4">
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="https://docs.holandesnawar.com/img/Nawar.png"
+                            alt="Holandés Nawar"
+                            class="h-7 w-auto opacity-95" />
+                    </div>
+                    <h1 class="font-display text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">
+                        Antes de preguntar, busca aquí
+                    </h1>
+                    <p class="text-sm text-white/65 mt-1.5">
+                        Quizás tu duda ya está resuelta por nuestro equipo.
+                    </p>
+
+                    <div class="relative mt-5">
                         <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400"></i>
                         <input id="searchInput" type="text" autocomplete="off"
                             placeholder="Ej: zullen, het vs de, pronunciación de la g…"
-                            class="w-full pl-12 pr-12 py-3.5 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors" />
+                            class="w-full pl-12 pr-12 py-3.5 text-base bg-white border border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-white/40 transition-colors" />
                         <button id="searchClear" onclick="clearSearch()" aria-label="Limpiar búsqueda"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
                             <i class="ph ph-x-circle text-xl"></i>
@@ -220,9 +244,9 @@
 
                     <div id="searchResults" class="hidden mt-5 space-y-3"></div>
 
-                    <div id="searchEmpty" class="hidden mt-5 bg-white rounded-xl p-5 border border-dashed border-gray-200 text-center">
+                    <div id="searchEmpty" class="hidden mt-5 bg-white rounded-xl p-5 text-center">
                         <p class="text-sm text-gray-700 mb-3">
-                            <i class="ph ph-info text-brand-500"></i>
+                            <i class="ph ph-info text-brand-600"></i>
                             No encontramos consultas sobre eso. ¿Quieres preguntarlo tú?
                         </p>
                         <button onclick="openModal()"
@@ -231,7 +255,7 @@
                         </button>
                     </div>
 
-                    <div id="searchLoading" class="hidden mt-5 text-center text-gray-500 text-sm">
+                    <div id="searchLoading" class="hidden mt-5 text-center text-white/70 text-sm">
                         <i class="ph ph-spinner-gap animate-spin"></i> Buscando…
                     </div>
                 </div>
@@ -239,7 +263,7 @@
 
             <!-- Feed Header -->
             <div class="mb-6 pb-4 border-b border-gray-200">
-                <h2 id="feedTitle" class="text-2xl font-bold tracking-tight text-gray-900 mb-2">Todas las consultas</h2>
+                <h2 id="feedTitle" class="font-display text-2xl font-bold tracking-tight text-gray-900 mb-2">Todas las consultas</h2>
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2 text-sm">
                         <span class="text-gray-500">Ordenar por:</span>
@@ -290,14 +314,14 @@
 
     <!-- New Consultation Modal -->
     <div id="newPostModal" role="dialog" aria-modal="true" aria-labelledby="newPostModalTitle"
-        class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-150">
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
 
-        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300"
+        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-150"
             id="modalContainer">
 
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
-                <h2 id="newPostModalTitle" class="text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
+                <h2 id="newPostModalTitle" class="font-display text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
                 <button onclick="closeModal()" aria-label="Cerrar modal"
                     class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full">
                     <i class="ph ph-x text-xl"></i>
@@ -393,10 +417,10 @@
 
     <!-- View Detail Modal -->
     <div id="viewPostModal" role="dialog" aria-modal="true"
-        class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-150">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onclick="closeViewModal()"></div>
 
-        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-300 overflow-hidden"
+        <div class="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] mx-4 transform scale-95 transition-transform duration-150 overflow-hidden"
             id="viewModalContainer">
 
             <div class="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
@@ -427,7 +451,7 @@
                 </div>
 
                 <div class="space-y-4">
-                    <h2 id="viewPostTitle" class="text-2xl font-extrabold text-gray-900 leading-tight"></h2>
+                    <h2 id="viewPostTitle" class="font-display text-2xl font-bold text-gray-900 leading-tight"></h2>
                     <div id="viewPostContent" class="text-gray-700 text-base leading-relaxed post-content-display space-y-3 break-words"></div>
                 </div>
 
@@ -451,7 +475,7 @@
 
             <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
                 <button onclick="closeViewModal()"
-                    class="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-gray-800 transition-all active:scale-95">
+                    class="px-6 py-2.5 bg-brand-600 text-white font-bold rounded-xl shadow-floating hover:bg-brand-700 transition-all active:scale-95">
                     Cerrar
                 </button>
             </div>
@@ -484,6 +508,7 @@
         let postsCache = new Map();
         let currentViewedPostId = null;
         let searchDebounceTimer = null;
+        let editingConsultaId = null; // si está set, modal edita; si null, crea nueva
 
         const escapeHTML = (str = '') => String(str)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -554,6 +579,27 @@
             if (isValidIdentityValue(name)) sessionStorage.setItem('nawarUserName', name);
         }
 
+        // ===================== EDIT TOKENS (consultas propias) =====================
+        const TOKENS_KEY = 'nawarMyConsultaTokens';
+        function getMyTokens() {
+            try {
+                return JSON.parse(localStorage.getItem(TOKENS_KEY) || '{}');
+            } catch { return {}; }
+        }
+        function setMyToken(consultaId, token) {
+            const tokens = getMyTokens();
+            tokens[consultaId] = token;
+            localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
+        }
+        function removeMyToken(consultaId) {
+            const tokens = getMyTokens();
+            delete tokens[consultaId];
+            localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
+        }
+        function isMyConsulta(consultaId) {
+            return !!getMyTokens()[consultaId];
+        }
+
         function getIdentity() {
             let name = sessionStorage.getItem('nawarUserName') || '';
             let email = sessionStorage.getItem('nawarUserEmail') || '';
@@ -593,8 +639,30 @@
         const modal = document.getElementById('newPostModal');
         const modalContainer = document.getElementById('modalContainer');
 
-        function openModal() {
+        function openModal(postToEdit = null) {
             applyIdentityToModal();
+
+            // Modo edición vs creación
+            const titleEl = document.getElementById('newPostModalTitle');
+            const submitBtn = document.getElementById('submitPostBtn');
+            if (postToEdit) {
+                editingConsultaId = postToEdit.id;
+                titleEl.textContent = 'Editar tu consulta';
+                submitBtn.innerHTML = '<i class="ph ph-floppy-disk"></i><span>Guardar cambios</span>';
+                document.getElementById('postTitle').value = postToEdit.title || '';
+                document.getElementById('postContent').innerHTML = sanitizeHTML(postToEdit.content || '');
+                document.getElementById('postCategory').value = postToEdit.category || '';
+                // En modo edición ocultamos guest fields porque ya se conoce al autor
+                document.getElementById('guestFields').classList.add('hidden');
+                document.getElementById('userGreeting').classList.remove('hidden');
+                document.getElementById('userGreetingName').textContent = postToEdit.author_name || '';
+                document.getElementById('userGreetingEmail').textContent = postToEdit.author_email || '';
+            } else {
+                editingConsultaId = null;
+                titleEl.textContent = 'Abre una nueva consulta';
+                submitBtn.innerHTML = '<i class="ph ph-paper-plane-right"></i><span>Publicar consulta</span>';
+            }
+
             modal.classList.remove('hidden');
             void modal.offsetWidth;
             modal.classList.remove('opacity-0');
@@ -607,12 +675,16 @@
             msg.innerHTML = '';
 
             setTimeout(() => {
-                const { name, email } = getIdentity();
-                const target = (name && email)
-                    ? document.getElementById('postCategory')
-                    : document.getElementById('postName');
-                target?.focus();
-            }, 100);
+                if (postToEdit) {
+                    document.getElementById('postTitle').focus();
+                } else {
+                    const { name, email } = getIdentity();
+                    const target = (name && email)
+                        ? document.getElementById('postCategory')
+                        : document.getElementById('postName');
+                    target?.focus();
+                }
+            }, 80);
         }
 
         function closeModal() {
@@ -621,8 +693,9 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
                 document.body.style.overflow = '';
-            }, 300);
+            }, 150);
 
+            editingConsultaId = null;
             document.getElementById('postTitle').value = '';
             document.getElementById('postContent').innerHTML = '';
             document.getElementById('postCategory').selectedIndex = 0;
@@ -691,7 +764,7 @@
             setTimeout(() => {
                 viewModal.classList.add('hidden');
                 document.body.style.overflow = '';
-            }, 300);
+            }, 150);
             currentViewedPostId = null;
 
             const url = new URL(location.href);
@@ -736,38 +809,104 @@
                 return;
             }
 
-            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Publicando…`;
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> ${editingConsultaId ? 'Guardando…' : 'Publicando…'}`;
             btn.disabled = true;
             btn.classList.add('opacity-75', 'cursor-not-allowed');
 
             try {
-                const { error } = await supabaseClient
-                    .from('consultas')
-                    .insert([{
-                        title, content, category,
-                        author_name: authorName,
-                        author_email: authorEmail,
-                    }]);
-                if (error) throw error;
+                if (editingConsultaId) {
+                    // Modo edición: llama a RPC con el token guardado
+                    const tokens = getMyTokens();
+                    const token = tokens[editingConsultaId];
+                    if (!token) throw new Error('No tienes permiso para editar esta consulta.');
 
-                sessionStorage.setItem('nawarUserName', authorName);
-                sessionStorage.setItem('nawarUserEmail', authorEmail);
+                    const { error } = await supabaseClient.rpc('update_my_consulta', {
+                        consulta_id: editingConsultaId,
+                        consulta_token: token,
+                        new_title: title,
+                        new_content: content,
+                        new_category: category,
+                    });
+                    if (error) throw error;
 
-                showMessage('¡Consulta publicada con éxito!');
+                    showMessage('Cambios guardados.');
+                } else {
+                    // Modo creación: insert y guardar token devuelto
+                    const { data, error } = await supabaseClient
+                        .from('consultas')
+                        .insert([{
+                            title, content, category,
+                            author_name: authorName,
+                            author_email: authorEmail,
+                        }])
+                        .select('id, edit_token')
+                        .single();
+                    if (error) throw error;
+
+                    if (data?.id && data?.edit_token) {
+                        setMyToken(data.id, data.edit_token);
+                    }
+
+                    sessionStorage.setItem('nawarUserName', authorName);
+                    sessionStorage.setItem('nawarUserEmail', authorEmail);
+
+                    showMessage('¡Consulta publicada con éxito!');
+                }
+
                 setTimeout(() => {
                     closeModal();
                     loadFeed();
                     btn.innerHTML = originalContent;
                     btn.disabled = false;
                     btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                }, 1200);
+                }, 900);
             } catch (e) {
                 console.error(e);
-                showMessage(`Error al publicar: ${e.message || e}`, true);
+                showMessage(`Error: ${e.message || e}`, true);
                 btn.innerHTML = originalContent;
                 btn.disabled = false;
                 btn.classList.remove('opacity-75', 'cursor-not-allowed');
             }
+        }
+
+        // ===================== EDIT/DELETE PROPIA =====================
+        async function deleteMyConsulta(consultaId) {
+            const tokens = getMyTokens();
+            const token = tokens[consultaId];
+            if (!token) {
+                showToast('No tienes permiso para borrar esta consulta');
+                return;
+            }
+            if (!confirm('¿Borrar tu consulta? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const { error } = await supabaseClient.rpc('delete_my_consulta', {
+                    consulta_id: consultaId,
+                    consulta_token: token,
+                });
+                if (error) throw error;
+
+                removeMyToken(consultaId);
+                postsCache.delete(consultaId);
+                showToast('Consulta eliminada');
+                loadFeed();
+            } catch (e) {
+                console.error(e);
+                showToast('Error al eliminar: ' + (e.message || e));
+            }
+        }
+
+        function editMyConsulta(consultaId) {
+            const post = postsCache.get(consultaId);
+            if (!post) {
+                showToast('No se encontró la consulta');
+                return;
+            }
+            if (post.resolved) {
+                showToast('No se puede editar una consulta ya resuelta');
+                return;
+            }
+            openModal(post);
         }
 
         function postCardHTML(post) {
@@ -776,18 +915,36 @@
             const safeName = escapeHTML(post.author_name || 'Anónimo');
             const safeTitle = escapeHTML(post.title || 'Sin título');
             const safeContent = sanitizeHTML(post.content || '');
+            const isOwn = isMyConsulta(post.id);
+            const canEdit = isOwn && !post.resolved;
 
             const badge = post.resolved
                 ? `<div class="flex flex-shrink-0 items-center text-green-600 bg-green-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-green-100"><i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelta</div>`
                 : `<div class="flex flex-shrink-0 items-center text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg text-xs font-medium border border-amber-100"><i class="ph-fill ph-clock mr-1 text-sm"></i> Pendiente</div>`;
 
+            const ownerBadge = isOwn
+                ? `<span class="ml-2 inline-flex items-center text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"><i class="ph ph-user mr-1"></i>Tuya</span>`
+                : '';
+
+            const ownerActions = canEdit ? `
+                <div class="flex items-center gap-2 ml-auto">
+                    <button data-action="edit" data-id="${escapeHTML(post.id)}" aria-label="Editar consulta"
+                        class="text-gray-400 hover:text-brand-600 hover:bg-brand-50 p-1.5 rounded-lg transition-colors" title="Editar">
+                        <i class="ph ph-pencil-simple text-base"></i>
+                    </button>
+                    <button data-action="delete" data-id="${escapeHTML(post.id)}" aria-label="Eliminar consulta"
+                        class="text-gray-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors" title="Eliminar">
+                        <i class="ph ph-trash text-base"></i>
+                    </button>
+                </div>` : '';
+
             return `
-                <article data-post-id="${escapeHTML(post.id)}" class="post-card bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-200 transition-all cursor-pointer">
+                <article data-post-id="${escapeHTML(post.id)}" class="post-card bg-white rounded-2xl p-5 shadow-soft border border-gray-100 hover:border-brand-300 transition-all cursor-pointer">
                     <div class="flex items-start justify-between mb-3 gap-4">
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
                             <img src="${avatarFor(post.author_name)}" class="w-10 h-10 rounded-full" alt="">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-900">${safeName}</h4>
+                            <div class="min-w-0">
+                                <h4 class="text-sm font-semibold text-gray-900 flex items-center flex-wrap">${safeName}${ownerBadge}</h4>
                                 <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
                                     <span>${timeAgo(post.created_at)}</span>
                                     <span>•</span>
@@ -800,10 +957,13 @@
                         </div>
                         ${badge}
                     </div>
-                    <h2 class="text-lg font-bold text-gray-900 mb-2">${safeTitle}</h2>
+                    <h2 class="font-display text-lg font-bold text-gray-900 mb-2">${safeTitle}</h2>
                     <div class="text-gray-600 text-sm mb-2 leading-relaxed line-clamp-2">${safeContent}</div>
-                    <div class="text-brand-600 text-sm font-bold mt-3 flex items-center gap-1">
-                        Ver detalles <i class="ph ph-arrow-right"></i>
+                    <div class="flex items-center justify-between mt-3">
+                        <div class="text-brand-600 text-sm font-bold flex items-center gap-1">
+                            Ver detalles <i class="ph ph-arrow-right"></i>
+                        </div>
+                        ${ownerActions}
                     </div>
                 </article>
             `;
@@ -1076,6 +1236,18 @@
         }
 
         document.addEventListener('click', (e) => {
+            // 1. Acciones específicas (edit/delete propia) tienen prioridad y no abren el modal de detalle
+            const actionBtn = e.target.closest('[data-action]');
+            if (actionBtn) {
+                e.stopPropagation();
+                e.preventDefault();
+                const id = actionBtn.dataset.id;
+                const action = actionBtn.dataset.action;
+                if (action === 'edit') editMyConsulta(id);
+                else if (action === 'delete') deleteMyConsulta(id);
+                return;
+            }
+            // 2. Click en card → abre modal de detalle
             const card = e.target.closest('.post-card');
             if (!card) return;
             const id = card.dataset.postId;

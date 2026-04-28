@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
@@ -18,16 +18,25 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'system-ui', 'sans-serif'],
+                    },
                     colors: {
                         brand: {
-                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                            50:  '#F0F5FF',
+                            100: '#DDE6F5',
+                            200: '#bfdbfe',
+                            300: '#4da3ff',
+                            500: '#025dc7',
+                            600: '#1D0084',
+                            700: '#150061',
+                            900: '#0C0C1E',
                         }
                     },
                     boxShadow: {
                         'soft': '0 2px 10px rgba(0,0,0,0.02), 0 10px 25px rgba(0,0,0,0.03)',
-                        'floating': '0 10px 40px -10px rgba(37,99,235,0.15)',
+                        'floating': '0 8px 32px rgba(29,0,132,0.12)',
                     }
                 }
             },
@@ -42,7 +51,12 @@
         }
     </script>
     <style>
-        body { background-color: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; }
+        body { background-color: #ffffff; color: #0C0C1E; font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Poppins', system-ui, sans-serif; }
+        .dots-dark {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
@@ -76,21 +90,21 @@
 <body class="antialiased min-h-screen flex flex-col">
 
     <!-- TOP BAR -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+    <header class="bg-brand-600 sticky top-0 z-40 relative overflow-hidden">
+        <div aria-hidden class="absolute inset-0 dots-dark pointer-events-none"></div>
+        <div class="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center">
-                    <i class="ph-fill ph-shield-check text-white text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="text-base font-bold text-gray-900 leading-tight">Panel Nawar</h1>
-                    <p class="text-xs text-gray-500 leading-tight">Gestión de consultas</p>
+                <img src="https://docs.holandesnawar.com/img/Nawar.png"
+                    alt="Holandés Nawar" class="h-7 w-auto opacity-95" />
+                <div class="hidden sm:block border-l border-white/20 pl-3">
+                    <h1 class="font-display text-base font-bold text-white leading-tight">Panel</h1>
+                    <p class="text-xs text-white/60 leading-tight">Gestión de consultas</p>
                 </div>
             </div>
             <div id="userBox" class="hidden flex items-center gap-3">
-                <span id="userEmailLabel" class="text-sm text-gray-600 hidden sm:inline"></span>
+                <span id="userEmailLabel" class="text-sm text-white/80 hidden sm:inline"></span>
                 <button onclick="logout()" aria-label="Cerrar sesión"
-                    class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">
+                    class="flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
                     <i class="ph ph-sign-out"></i>
                     <span class="hidden sm:inline">Salir</span>
                 </button>
@@ -106,7 +120,7 @@
                     <i class="ph-fill ph-shield-check text-brand-600 text-3xl"></i>
                 </div>
             </div>
-            <h2 class="text-xl font-extrabold text-gray-900 text-center mb-1">Acceso del equipo</h2>
+            <h2 class="font-display text-xl font-bold text-gray-900 text-center mb-1">Acceso del equipo</h2>
             <p class="text-sm text-gray-600 text-center mb-6">
                 Solo personal autorizado.
             </p>
@@ -142,7 +156,7 @@
             <div class="w-16 h-16 mx-auto rounded-2xl bg-red-50 flex items-center justify-center mb-4">
                 <i class="ph-fill ph-warning-octagon text-red-600 text-3xl"></i>
             </div>
-            <h2 class="text-xl font-extrabold text-gray-900 mb-1">Sin permisos</h2>
+            <h2 class="font-display text-xl font-bold text-gray-900 mb-1">Sin permisos</h2>
             <p class="text-sm text-gray-600 mb-5">
                 Tu cuenta (<span id="notAdminEmail" class="font-medium text-gray-800"></span>)
                 no está en la lista de administradores. Si es un error, contacta con el equipo.
@@ -211,7 +225,7 @@
                                     <i class="ph ph-x text-xl"></i>
                                 </button>
                             </div>
-                            <h2 id="detailTitle" class="text-xl font-extrabold text-gray-900 leading-tight mb-3"></h2>
+                            <h2 id="detailTitle" class="font-display text-xl font-bold text-gray-900 leading-tight mb-3"></h2>
                             <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600">
                                 <span class="flex items-center gap-1"><i class="ph ph-user"></i> <span id="detailAuthor"></span></span>
                                 <span class="flex items-center gap-1"><i class="ph ph-envelope"></i> <span id="detailEmail"></span></span>
