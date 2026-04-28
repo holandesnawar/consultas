@@ -1060,6 +1060,22 @@
             else if (!modal.classList.contains('hidden')) closeModal();
         });
 
+        // ===================== PARENT HEIGHT (para iframe en Circle) =====================
+        function postHeightToParent() {
+            if (window.parent === window) return; // no embebido
+            const h = Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.offsetHeight
+            );
+            window.parent.postMessage({ type: 'consultas-height', height: h }, '*');
+        }
+        if ('ResizeObserver' in window) {
+            new ResizeObserver(() => postHeightToParent()).observe(document.body);
+        }
+        window.addEventListener('load', postHeightToParent);
+
         document.addEventListener('DOMContentLoaded', async () => {
             loadIdentityFromURL();
             buildCategoriesNav();
@@ -1076,6 +1092,7 @@
 
             await loadFeed(false);
             handleDeeplink();
+            setTimeout(postHeightToParent, 200);
         });
     </script>
 </body>
