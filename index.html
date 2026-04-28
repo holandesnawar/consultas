@@ -555,10 +555,18 @@
         }
 
         function getIdentity() {
-            return {
-                name: sessionStorage.getItem('nawarUserName') || '',
-                email: sessionStorage.getItem('nawarUserEmail') || '',
-            };
+            let name = sessionStorage.getItem('nawarUserName') || '';
+            let email = sessionStorage.getItem('nawarUserEmail') || '';
+            // Limpia valores corruptos persistidos (merge tags literales, emails de prueba)
+            if (!isValidIdentityValue(name)) {
+                sessionStorage.removeItem('nawarUserName');
+                name = '';
+            }
+            if (!isValidEmail(email)) {
+                sessionStorage.removeItem('nawarUserEmail');
+                email = '';
+            }
+            return { name, email };
         }
 
         function applyIdentityToModal() {
