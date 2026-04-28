@@ -84,11 +84,12 @@
         }
 
         .nav-link.active {
-            background-color: #eff6ff;
-            color: #2563eb;
-            font-weight: 500;
+            background-color: #F0F5FF;
+            color: #1D0084;
+            font-weight: 600;
+            box-shadow: inset 3px 0 0 #1D0084;
         }
-        .nav-link.active i { color: #2563eb; }
+        .nav-link.active i { color: #1D0084; }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide {
@@ -280,10 +281,15 @@
 
             <div id="feedContainer" class="space-y-4 hidden"></div>
 
-            <div id="loadMoreContainer" class="mt-8 flex justify-center hidden">
-                <button onclick="loadMore()"
-                    class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm">
-                    Cargar más consultas
+            <div id="paginationContainer" class="mt-8 flex items-center justify-between gap-3 hidden">
+                <button id="prevPageBtn" onclick="prevPage()" aria-label="Página anterior"
+                    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-brand-50 hover:border-brand-300 hover:text-brand-600 transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-200 disabled:hover:text-gray-700">
+                    <i class="ph ph-arrow-left"></i> Anterior
+                </button>
+                <span id="paginationInfo" class="text-sm text-gray-500 font-medium"></span>
+                <button id="nextPageBtn" onclick="nextPage()" aria-label="Página siguiente"
+                    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-brand-50 hover:border-brand-300 hover:text-brand-600 transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-200 disabled:hover:text-gray-700">
+                    Siguiente <i class="ph ph-arrow-right"></i>
                 </button>
             </div>
         </main>
@@ -323,7 +329,7 @@
                 </button>
             </div>
 
-            <div class="px-6 py-5 overflow-y-auto flex-1 space-y-4 bg-gray-50/50">
+            <div class="px-6 pt-4 pb-5 overflow-y-auto flex-1 space-y-3.5 bg-gray-50/50">
 
                 <div id="guestFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -477,7 +483,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsaWZqaHFqbWVkc3RrYWZucm1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTA4MTUsImV4cCI6MjA4Nzg2NjgxNX0.Gz0tMmEy1rcNdjaH7pYkoySMm3PBczmgCuaWobMdOtQ';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const POSTS_PER_PAGE = 5;
+        const POSTS_PER_PAGE = 3;
 
         const CATEGORY_DATA = [
             { id: 'acceso',    name: 'Acceso y cuenta',     color: 'blue'   },
@@ -491,7 +497,8 @@
 
         let currentCategoryFilter = null;
         let currentResolvedFilter = null;
-        let lastLoadedRow = 0;
+        let currentPage = 0;     // 0-indexed
+        let totalPages = 0;
         let postsCache = new Map();
         let currentViewedPostId = null;
         let searchDebounceTimer = null;
@@ -951,46 +958,46 @@
             `;
         }
 
-        async function loadFeed(isAppend = false) {
+        async function loadFeed(resetPage = true) {
             const container = document.getElementById('feedContainer');
             const skeleton = document.getElementById('feedSkeleton');
-            const loadBtn = document.getElementById('loadMoreContainer');
+            const pagination = document.getElementById('paginationContainer');
 
-            if (!isAppend) {
-                container.innerHTML = '';
-                container.classList.add('hidden');
-                skeleton.classList.remove('hidden');
-                loadBtn.classList.add('hidden');
-                lastLoadedRow = 0;
-            }
+            if (resetPage) currentPage = 0;
+
+            container.innerHTML = '';
+            container.classList.add('hidden');
+            skeleton.classList.remove('hidden');
+            pagination.classList.add('hidden');
 
             try {
                 let query = supabaseClient
                     .from('consultas')
-                    .select('id,title,content,category,author_name,created_at,resolved,respuesta_nawar');
+                    .select('id,title,content,category,author_name,created_at,resolved,respuesta_nawar', { count: 'exact' });
 
                 if (currentCategoryFilter) query = query.eq('category', currentCategoryFilter);
                 if (currentResolvedFilter !== null) query = query.eq('resolved', currentResolvedFilter);
 
                 const sortVal = document.getElementById('sortSelect').value;
                 query = query.order('created_at', { ascending: sortVal === 'asc' });
-                query = query.range(lastLoadedRow, lastLoadedRow + POSTS_PER_PAGE - 1);
 
-                const { data, error } = await query;
+                const from = currentPage * POSTS_PER_PAGE;
+                const to = from + POSTS_PER_PAGE - 1;
+                query = query.range(from, to);
+
+                const { data, error, count } = await query;
                 if (error) throw error;
 
-                if ((!data || data.length === 0) && !isAppend) {
+                totalPages = count ? Math.max(1, Math.ceil(count / POSTS_PER_PAGE)) : 0;
+
+                if (!data || data.length === 0) {
                     container.innerHTML = renderEmptyState();
-                } else if (data?.length) {
+                } else {
                     data.forEach(p => postsCache.set(p.id, p));
-                    const html = data.map(postCardHTML).join('');
-                    if (isAppend) container.insertAdjacentHTML('beforeend', html);
-                    else container.innerHTML = html;
-                    lastLoadedRow += data.length;
-                    if (data.length === POSTS_PER_PAGE) loadBtn.classList.remove('hidden');
-                    else loadBtn.classList.add('hidden');
+                    container.innerHTML = data.map(postCardHTML).join('');
                 }
 
+                renderPagination();
                 container.classList.remove('hidden');
                 updateCategoryCounts();
             } catch (e) {
@@ -999,6 +1006,44 @@
                 container.classList.remove('hidden');
             } finally {
                 skeleton.classList.add('hidden');
+            }
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('paginationContainer');
+            const info = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+
+            if (totalPages <= 1) {
+                pagination.classList.add('hidden');
+                return;
+            }
+
+            pagination.classList.remove('hidden');
+            info.textContent = `Página ${currentPage + 1} de ${totalPages}`;
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage >= totalPages - 1;
+        }
+
+        function nextPage() {
+            if (currentPage >= totalPages - 1) return;
+            currentPage++;
+            loadFeed(false);
+            // Scroll suave al inicio del feed
+            document.getElementById('feedContainer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'consultas-modal-opened' }, '*');
+            }
+        }
+
+        function prevPage() {
+            if (currentPage <= 0) return;
+            currentPage--;
+            loadFeed(false);
+            document.getElementById('feedContainer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'consultas-modal-opened' }, '*');
             }
         }
 
@@ -1026,14 +1071,12 @@
                 </div>`;
         }
 
-        function loadMore() { loadFeed(true); }
-
         function filterCategory(categoryName, event) {
             event?.preventDefault();
             currentCategoryFilter = categoryName;
             currentResolvedFilter = null;
             updateActiveNavLinks(categoryName, null);
-            loadFeed(false);
+            loadFeed();
         }
 
         function filterPending(event) {
@@ -1041,7 +1084,7 @@
             currentCategoryFilter = null;
             currentResolvedFilter = false;
             updateActiveNavLinks(null, false);
-            loadFeed(false);
+            loadFeed();
         }
 
         function filterResolved(event) {
@@ -1049,7 +1092,7 @@
             currentCategoryFilter = null;
             currentResolvedFilter = true;
             updateActiveNavLinks(null, true);
-            loadFeed(false);
+            loadFeed();
         }
 
         function updateActiveNavLinks(categoryName, resolvedFilter) {
@@ -1273,7 +1316,7 @@
                 if (e.key === 'Escape') clearSearch();
             });
 
-            await loadFeed(false);
+            await loadFeed();
             handleDeeplink();
             setTimeout(postHeightToParent, 200);
         });
