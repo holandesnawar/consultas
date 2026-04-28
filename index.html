@@ -529,12 +529,29 @@
             showToast._tid = setTimeout(() => t.classList.add('hidden'), ms);
         }
 
+        // Descarta valores que parecen merge tags no reemplazados (ej. "{{member.email}}")
+        // o emails de prueba evidentes ("test@test.com", "test%test.com")
+        function isValidIdentityValue(v) {
+            if (!v) return false;
+            const s = String(v).trim();
+            if (!s) return false;
+            if (s.includes('{{') || s.includes('}}')) return false;
+            return true;
+        }
+        function isValidEmail(v) {
+            if (!isValidIdentityValue(v)) return false;
+            const s = String(v).trim().toLowerCase();
+            // Rechaza emails de prueba evidentes
+            if (s.includes('test@test') || s.includes('test%test') || s.endsWith('@test.com') || s.endsWith('@example.com')) return false;
+            return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s);
+        }
+
         function loadIdentityFromURL() {
             const params = new URLSearchParams(location.search);
             const email = params.get('email');
             const name = params.get('name');
-            if (email) sessionStorage.setItem('nawarUserEmail', email);
-            if (name) sessionStorage.setItem('nawarUserName', name);
+            if (isValidEmail(email)) sessionStorage.setItem('nawarUserEmail', email);
+            if (isValidIdentityValue(name)) sessionStorage.setItem('nawarUserName', name);
         }
 
         function getIdentity() {
@@ -548,14 +565,18 @@
             const { name, email } = getIdentity();
             const greeting = document.getElementById('userGreeting');
             const guestFields = document.getElementById('guestFields');
+            // Pre-rellena lo que tengamos
+            if (name) document.getElementById('postName').value = name;
+            if (email) document.getElementById('postEmail').value = email;
+
             if (name && email) {
-                document.getElementById('postName').value = name;
-                document.getElementById('postEmail').value = email;
+                // Identidad completa → oculta campos, muestra banner
                 document.getElementById('userGreetingName').textContent = name;
                 document.getElementById('userGreetingEmail').textContent = email;
                 greeting.classList.remove('hidden');
                 guestFields.classList.add('hidden');
             } else {
+                // Falta algo → muestra campos (pre-rellenados si hay datos parciales)
                 greeting.classList.add('hidden');
                 guestFields.classList.remove('hidden');
             }
