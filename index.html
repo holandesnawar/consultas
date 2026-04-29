@@ -88,13 +88,13 @@
             background-color: #1D0084 !important;
             color: #ffffff !important;
             font-weight: 600;
+            cursor: default;
         }
-        .nav-link.active:hover { background-color: #150061 !important; }
         .nav-link.active i,
         .nav-link.active:hover i { color: #ffffff !important; }
         .nav-link.active:hover .group-hover\:text-gray-600 { color: #ffffff !important; }
-        .nav-link.active span.bg-gray-100 { background-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.95); }
-        .nav-link.active:hover span.bg-gray-100 { background-color: rgba(255,255,255,0.25); }
+        .nav-link.active span.bg-gray-100,
+        .nav-link.active:hover span.bg-gray-100 { background-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.95); }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide {
@@ -145,6 +145,21 @@
 
     <!-- Mobile top bar -->
     <div class="md:hidden p-4 pb-0 w-full overflow-hidden">
+        <!-- Mini-explicación en móvil (en desktop está en el sidebar derecho) -->
+        <div class="bg-white rounded-xl p-3.5 mb-3 border border-gray-100 shadow-soft">
+            <div class="flex items-start gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
+                    <i class="ph-fill ph-info text-brand-600 text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-sm text-gray-900 leading-tight">Sobre las Consultas</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed mt-0.5">
+                        Resuelve dudas sobre el idioma o la formación. Te avisaremos por email cuando respondamos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <button onclick="openModal()" aria-label="Abrir nueva consulta"
             class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating transition-all mb-4">
             <i class="ph ph-pencil-simple text-lg"></i>
@@ -448,7 +463,7 @@
 
             <div class="p-6 overflow-y-auto flex-1 space-y-6 bg-white">
                 <div class="flex items-center gap-4">
-                    <img id="viewPostAvatar" src="" class="w-12 h-12 rounded-full border-2 border-brand-100" alt="">
+                    <img id="viewPostAvatar" src="" class="w-12 h-12 rounded-full" alt="">
                     <div>
                         <h4 id="viewPostAuthor" class="text-base font-bold text-gray-900"></h4>
                         <div class="text-xs text-gray-500 flex flex-wrap items-center gap-x-2 gap-y-1">
