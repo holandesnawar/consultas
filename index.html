@@ -138,6 +138,14 @@
             padding: 0 2px;
             border-radius: 3px;
         }
+
+        /* Mobile category select: estado activo con color de marca */
+        .mobile-cat-select.is-active {
+            background-color: #1D0084 !important;
+            border-color: #1D0084 !important;
+            color: #ffffff !important;
+        }
+        .mobile-cat-select.is-active ~ i { color: rgba(255,255,255,0.85) !important; }
     </style>
 </head>
 
@@ -167,7 +175,7 @@
             <div class="sticky top-8 space-y-8">
 
                 <button onclick="openModal()" aria-label="Abrir nueva consulta"
-                    class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating transition-all transform hover:-translate-y-0.5">
+                    class="w-full flex items-center justify-center gap-2 bg-brand-600 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating transition-all transform hover:-translate-y-0.5">
                     <i class="ph ph-pencil-simple text-lg"></i>
                     Nueva Consulta
                 </button>
@@ -214,7 +222,7 @@
 
                 <div class="relative">
                     <h1 class="font-display text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">
-                        Antes de preguntar, busca aquí
+                        Antes de preguntar, busca aquí tu consulta
                     </h1>
                     <p class="text-sm text-white/65 mt-1.5">
                         Quizás tu duda ya está resuelta por nuestro equipo.
@@ -239,7 +247,7 @@
                             No encontramos consultas sobre eso. ¿Quieres preguntarlo tú?
                         </p>
                         <button onclick="openModal()"
-                            class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-colors">
+                            class="inline-flex items-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-colors">
                             <i class="ph ph-pencil-simple"></i> Hacer mi consulta
                         </button>
                     </div>
@@ -253,30 +261,34 @@
             <!-- Mobile only: botón Nueva Consulta + filtros (después del hero) -->
             <div class="md:hidden mb-5 space-y-3">
                 <button onclick="openModal()" aria-label="Abrir nueva consulta"
-                    class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating transition-all">
+                    class="w-full flex items-center justify-center gap-2 bg-brand-600 text-white px-4 py-3 rounded-xl font-medium shadow-floating transition-all">
                     <i class="ph ph-pencil-simple text-lg"></i>
                     <span>Nueva Consulta</span>
                 </button>
-                <div class="flex overflow-x-auto gap-2 pb-1 scrollbar-hide" id="mobileNav">
+                <div class="flex items-center gap-2" id="mobileNav">
+                    <!-- Pills de estado: Todo / Pendientes / Resueltas -->
                     <button data-filter="all" onclick="filterCategory(null, event)"
-                        class="mobile-nav-link active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
+                        class="mobile-nav-link active whitespace-nowrap px-3.5 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
                     <button data-filter="pending" onclick="filterPending(event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
+                        class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
                     <button data-filter="resolved" onclick="filterResolved(event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
-                    <div class="self-stretch w-px bg-gray-200 mx-1 flex-shrink-0" aria-hidden="true"></div>
-                    <button data-filter="acceso" onclick="filterCategory('acceso', event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Acceso</button>
-                    <button data-filter="gramatica" onclick="filterCategory('gramatica', event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Gramática</button>
-                    <button data-filter="comunidad" onclick="filterCategory('comunidad', event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Comunidad</button>
-                    <button data-filter="recursos" onclick="filterCategory('recursos', event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Recursos</button>
-                    <button data-filter="tecnico" onclick="filterCategory('tecnico', event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Técnico</button>
-                    <button data-filter="metodo" onclick="filterCategory('metodo', event)"
-                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Método</button>
+                        class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
+
+                    <!-- Dropdown nativo de categorías (se renderiza como bottom sheet en iOS/Android) -->
+                    <div class="relative ml-auto flex-shrink-0">
+                        <select id="mobileCategorySelect" onchange="filterCategoryFromMobile(this.value)" aria-label="Filtrar por categoría"
+                            class="mobile-cat-select appearance-none bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 pl-9 pr-8 py-2 focus:outline-none focus:border-brand-600 cursor-pointer transition-colors">
+                            <option value="">Categoría</option>
+                            <option value="acceso">Acceso y cuenta</option>
+                            <option value="gramatica">Gramática</option>
+                            <option value="comunidad">Comunidad</option>
+                            <option value="recursos">Recursos</option>
+                            <option value="tecnico">Problemas técnicos</option>
+                            <option value="metodo">Método y Estudio</option>
+                        </select>
+                        <i class="ph ph-funnel absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-base"></i>
+                        <i class="ph ph-caret-down absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs"></i>
+                    </div>
                 </div>
             </div>
 
@@ -358,7 +370,7 @@
                     <div class="min-w-0">
                         <h3 class="font-bold text-sm text-gray-900 leading-tight">Tiempo de respuesta</h3>
                         <p class="text-xs text-gray-600 leading-relaxed mt-1">
-                            Solemos responder en menos de 48&nbsp;h hábiles. Te llegará un email con el aviso.
+                            Solemos responder en menos de 24&nbsp;h hábiles. Te llegará un email con el aviso.
                         </p>
                     </div>
                 </div>
@@ -452,7 +464,7 @@
                     <button type="button" onclick="closeModal()"
                         class="px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">Cancelar</button>
                     <button type="button" id="submitPostBtn" onclick="submitPost()"
-                        class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-floating transition-all flex items-center gap-2 whitespace-nowrap">
+                        class="px-6 py-2.5 bg-brand-600 text-white font-medium rounded-xl shadow-floating transition-all flex items-center gap-2 whitespace-nowrap">
                         <i class="ph ph-paper-plane-right"></i>
                         <span>Publicar consulta</span>
                     </button>
@@ -474,12 +486,12 @@
                 <div class="flex items-center gap-1">
                     <div id="viewOwnerActions" class="hidden flex items-center gap-1 mr-1 pr-1 border-r border-gray-200">
                         <button onclick="editFromView()" aria-label="Editar consulta" title="Editar"
-                            class="text-gray-400 hover:text-brand-600 hover:bg-brand-50 transition-colors p-1.5 rounded-lg">
-                            <i class="ph ph-pencil-simple text-base"></i>
+                            class="text-gray-500 hover:text-brand-600 transition-colors p-2 rounded-lg">
+                            <i class="ph ph-pencil-simple text-lg"></i>
                         </button>
                         <button onclick="deleteFromView()" aria-label="Eliminar consulta" title="Eliminar"
-                            class="text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors p-1.5 rounded-lg">
-                            <i class="ph ph-trash text-base"></i>
+                            class="text-gray-500 hover:text-red-600 transition-colors p-2 rounded-lg">
+                            <i class="ph ph-trash text-lg"></i>
                         </button>
                     </div>
                     <button onclick="copyDeeplink()" aria-label="Copiar enlace" title="Copiar enlace"
@@ -531,7 +543,7 @@
 
             <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
                 <button onclick="closeViewModal()"
-                    class="px-6 py-2.5 bg-brand-600 text-white font-bold rounded-xl shadow-floating hover:bg-brand-700 transition-all active:scale-95">
+                    class="px-6 py-2.5 bg-brand-600 text-white font-bold rounded-xl shadow-floating transition-all active:scale-95">
                     Cerrar
                 </button>
             </div>
@@ -1010,14 +1022,14 @@
                 : '';
 
             const ownerActions = canEdit ? `
-                <div class="flex items-center gap-1.5 ml-auto">
+                <div class="flex items-center gap-1 ml-auto">
                     <button data-action="edit" data-id="${escapeHTML(post.id)}" aria-label="Editar consulta"
-                        class="text-gray-400 hover:text-brand-600 hover:bg-brand-50 p-1.5 rounded-lg transition-colors" title="Editar">
-                        <i class="ph ph-pencil-simple text-sm"></i>
+                        class="text-gray-500 hover:text-brand-600 p-2 rounded-lg transition-colors" title="Editar">
+                        <i class="ph ph-pencil-simple text-lg"></i>
                     </button>
                     <button data-action="delete" data-id="${escapeHTML(post.id)}" aria-label="Eliminar consulta"
-                        class="text-gray-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors" title="Eliminar">
-                        <i class="ph ph-trash text-sm"></i>
+                        class="text-gray-500 hover:text-red-600 p-2 rounded-lg transition-colors" title="Eliminar">
+                        <i class="ph ph-trash text-lg"></i>
                     </button>
                 </div>` : '';
 
@@ -1184,6 +1196,19 @@
             loadFeed();
         }
 
+        // Mobile: cambio desde el <select> de categorías
+        function filterCategoryFromMobile(categoryId) {
+            if (!categoryId) {
+                // Limpia y vuelve a "Todo"
+                currentCategoryFilter = null;
+                currentResolvedFilter = null;
+                updateActiveNavLinks(null, null);
+            } else {
+                filterCategory(categoryId);
+            }
+            loadFeed();
+        }
+
         function updateActiveNavLinks(categoryName, resolvedFilter) {
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
 
@@ -1208,6 +1233,14 @@
             else if (resolvedFilter === true) title.textContent = 'Consultas resueltas';
             else if (categoryName) title.textContent = `Consultas: ${CAT_BY_ID[categoryName]?.name || categoryName}`;
             else title.textContent = 'Todas las consultas';
+
+            // Sincronizar el <select> mobile de categorías
+            const mobSelect = document.getElementById('mobileCategorySelect');
+            if (mobSelect) {
+                mobSelect.value = categoryName || '';
+                if (categoryName) mobSelect.classList.add('is-active');
+                else mobSelect.classList.remove('is-active');
+            }
         }
 
         function buildCategoriesNav() {
