@@ -83,13 +83,18 @@
             transition-duration: 200ms;
         }
 
-        .nav-link.active {
-            background-color: #1D0084;
-            color: #ffffff;
+        .nav-link.active,
+        .nav-link.active:hover {
+            background-color: #1D0084 !important;
+            color: #ffffff !important;
             font-weight: 600;
         }
-        .nav-link.active i { color: #ffffff; }
+        .nav-link.active:hover { background-color: #150061 !important; }
+        .nav-link.active i,
+        .nav-link.active:hover i { color: #ffffff !important; }
+        .nav-link.active:hover .group-hover\:text-gray-600 { color: #ffffff !important; }
         .nav-link.active span.bg-gray-100 { background-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.95); }
+        .nav-link.active:hover span.bg-gray-100 { background-color: rgba(255,255,255,0.25); }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide {
@@ -316,10 +321,10 @@
 
     <!-- New Consultation Modal -->
     <div id="newPostModal" role="dialog" aria-modal="true" aria-labelledby="newPostModalTitle"
-        class="fixed inset-0 z-50 flex items-stretch sm:items-start justify-center sm:pt-4 md:pt-10 sm:px-3 hidden opacity-0 transition-opacity duration-150">
+        class="fixed inset-0 z-50 flex items-start justify-center pt-4 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
 
-        <div class="relative bg-white w-full sm:max-w-3xl rounded-none sm:rounded-2xl shadow-2xl flex flex-col h-full sm:h-auto sm:max-h-[92vh] transform scale-95 transition-transform duration-150"
+        <div class="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] transform scale-95 transition-transform duration-150"
             id="modalContainer">
 
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -411,10 +416,10 @@
 
     <!-- View Detail Modal -->
     <div id="viewPostModal" role="dialog" aria-modal="true"
-        class="fixed inset-0 z-50 flex items-stretch sm:items-start justify-center sm:pt-4 md:pt-10 sm:px-3 hidden opacity-0 transition-opacity duration-150">
+        class="fixed inset-0 z-50 flex items-start justify-center pt-4 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onclick="closeViewModal()"></div>
 
-        <div class="relative bg-white w-full sm:max-w-3xl rounded-none sm:rounded-2xl shadow-2xl flex flex-col h-full sm:h-auto sm:max-h-[92vh] transform scale-95 transition-transform duration-150 overflow-hidden"
+        <div class="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] transform scale-95 transition-transform duration-150 overflow-hidden"
             id="viewModalContainer">
 
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
@@ -759,6 +764,12 @@
             viewModalContainer.classList.remove('scale-95');
             document.body.style.overflow = 'hidden';
 
+            // Avisa al padre (Circle) para que haga scroll al iframe
+            // y el modal quede visible aunque la card estuviera scrolleada abajo
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'consultas-modal-opened' }, '*');
+            }
+
             const url = new URL(location.href);
             url.searchParams.set('id', post.id);
             history.replaceState(null, '', url);
@@ -946,7 +957,10 @@
                 ? `<div class="flex flex-shrink-0 items-center text-green-700 bg-green-50 px-2 py-1 rounded-lg text-[11px] font-semibold border border-green-100"><i class="ph-fill ph-check-circle mr-1 text-sm"></i> Resuelta</div>`
                 : `<div class="flex flex-shrink-0 items-center text-amber-700 bg-amber-50 px-2 py-1 rounded-lg text-[11px] font-semibold border border-amber-100"><i class="ph-fill ph-question mr-1 text-sm"></i> Pendiente</div>`;
 
-            const avatarRing = isOwn ? 'ring-2 ring-brand-600 ring-offset-2 ring-offset-white' : '';
+            // Badge "Tuya": morado sólido + icono persona, claro y premium
+            const ownerBadge = isOwn
+                ? `<span class="inline-flex items-center gap-1 bg-brand-600 text-white px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider flex-shrink-0"><i class="ph-fill ph-user-circle text-[10px]"></i>Tuya</span>`
+                : '';
 
             const ownerActions = canEdit ? `
                 <div class="flex items-center gap-1.5 ml-auto">
@@ -964,9 +978,12 @@
                 <article data-post-id="${escapeHTML(post.id)}" class="post-card bg-white rounded-xl p-4 shadow-soft border border-gray-100 hover:border-brand-600 hover:shadow-floating transition-all cursor-pointer">
                     <div class="flex items-start justify-between mb-2 gap-2.5">
                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                            <img src="${avatarFor(post.author_name)}" class="w-9 h-9 rounded-full flex-shrink-0 ${avatarRing}" alt="">
+                            <img src="${avatarFor(post.author_name)}" class="w-9 h-9 rounded-full flex-shrink-0" alt="">
                             <div class="min-w-0 flex-1">
-                                <h4 class="text-xs font-semibold text-gray-900 leading-tight truncate" title="${safeName}">${safeName}</h4>
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <h4 class="text-xs font-semibold text-gray-900 leading-tight truncate" title="${safeName}">${safeName}</h4>
+                                    ${ownerBadge}
+                                </div>
                                 <div class="text-[11px] text-gray-500 flex items-center gap-x-1.5 mt-0.5 min-w-0">
                                     <span class="flex-shrink-0">${timeAgo(post.created_at)}</span>
                                     <span class="flex-shrink-0">•</span>
