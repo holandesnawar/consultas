@@ -143,10 +143,9 @@
 
 <body class="antialiased min-h-screen flex flex-col bg-transparent">
 
-    <!-- Mobile top bar -->
-    <div class="md:hidden p-4 pb-0 w-full overflow-hidden">
-        <!-- Mini-explicación en móvil (en desktop está en el sidebar derecho) -->
-        <div class="bg-white rounded-xl p-3.5 mb-3 border border-gray-100 shadow-soft">
+    <!-- Mobile top bar: solo la mini-info -->
+    <div class="md:hidden px-4 pt-4 w-full overflow-hidden">
+        <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-soft">
             <div class="flex items-start gap-2.5">
                 <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
                     <i class="ph-fill ph-info text-brand-600 text-base"></i>
@@ -158,33 +157,6 @@
                     </p>
                 </div>
             </div>
-        </div>
-
-        <button onclick="openModal()" aria-label="Abrir nueva consulta"
-            class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating transition-all mb-4">
-            <i class="ph ph-pencil-simple text-lg"></i>
-            <span>Nueva Consulta</span>
-        </button>
-        <div class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide" id="mobileNav">
-            <button data-filter="all" onclick="filterCategory(null, event)"
-                class="mobile-nav-link active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
-            <button data-filter="pending" onclick="filterPending(event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
-            <button data-filter="resolved" onclick="filterResolved(event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
-            <div class="self-stretch w-px bg-gray-200 mx-1 flex-shrink-0" aria-hidden="true"></div>
-            <button data-filter="acceso" onclick="filterCategory('acceso', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Acceso</button>
-            <button data-filter="gramatica" onclick="filterCategory('gramatica', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Gramática</button>
-            <button data-filter="comunidad" onclick="filterCategory('comunidad', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Comunidad</button>
-            <button data-filter="recursos" onclick="filterCategory('recursos', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Recursos</button>
-            <button data-filter="tecnico" onclick="filterCategory('tecnico', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Técnico</button>
-            <button data-filter="metodo" onclick="filterCategory('metodo', event)"
-                class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Método</button>
         </div>
     </div>
 
@@ -278,6 +250,36 @@
                 </div>
             </section>
 
+            <!-- Mobile only: botón Nueva Consulta + filtros (después del hero) -->
+            <div class="md:hidden mb-5 space-y-3">
+                <button onclick="openModal()" aria-label="Abrir nueva consulta"
+                    class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-medium shadow-floating transition-all">
+                    <i class="ph ph-pencil-simple text-lg"></i>
+                    <span>Nueva Consulta</span>
+                </button>
+                <div class="flex overflow-x-auto gap-2 pb-1 scrollbar-hide" id="mobileNav">
+                    <button data-filter="all" onclick="filterCategory(null, event)"
+                        class="mobile-nav-link active whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
+                    <button data-filter="pending" onclick="filterPending(event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
+                    <button data-filter="resolved" onclick="filterResolved(event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
+                    <div class="self-stretch w-px bg-gray-200 mx-1 flex-shrink-0" aria-hidden="true"></div>
+                    <button data-filter="acceso" onclick="filterCategory('acceso', event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Acceso</button>
+                    <button data-filter="gramatica" onclick="filterCategory('gramatica', event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Gramática</button>
+                    <button data-filter="comunidad" onclick="filterCategory('comunidad', event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Comunidad</button>
+                    <button data-filter="recursos" onclick="filterCategory('recursos', event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Recursos</button>
+                    <button data-filter="tecnico" onclick="filterCategory('tecnico', event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Técnico</button>
+                    <button data-filter="metodo" onclick="filterCategory('metodo', event)"
+                        class="mobile-nav-link whitespace-nowrap px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Método</button>
+                </div>
+            </div>
+
             <!-- Feed Header -->
             <div class="mb-6 pb-4 border-b border-gray-200">
                 <h2 id="feedTitle" class="font-display text-2xl font-bold tracking-tight text-gray-900 mb-2">Todas las consultas</h2>
@@ -336,7 +338,7 @@
 
     <!-- New Consultation Modal -->
     <div id="newPostModal" role="dialog" aria-modal="true" aria-labelledby="newPostModalTitle"
-        class="fixed inset-0 z-50 flex items-start justify-center pt-4 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
+        class="fixed inset-0 z-50 flex items-start justify-center pt-12 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
 
         <div class="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] transform scale-95 transition-transform duration-150"
@@ -431,7 +433,7 @@
 
     <!-- View Detail Modal -->
     <div id="viewPostModal" role="dialog" aria-modal="true"
-        class="fixed inset-0 z-50 flex items-start justify-center pt-4 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
+        class="fixed inset-0 z-50 flex items-start justify-center pt-12 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onclick="closeViewModal()"></div>
 
         <div class="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] transform scale-95 transition-transform duration-150 overflow-hidden"
