@@ -98,9 +98,23 @@ function renderEmailHTML({ name, title, link }: { name: string; title: string; l
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
 <title>Respuesta a tu consulta · Holandés Nawar</title>
+<style>
+  :root { color-scheme: light only; supported-color-schemes: light only; }
+  /* Forzar colores en modo oscuro de Gmail/Apple Mail/Outlook */
+  @media (prefers-color-scheme: dark) {
+    body, table, td, div, p, h1, h2, h3, h4, span, a {
+      background-color: revert !important;
+      color: revert !important;
+    }
+  }
+  [data-ogsc] body, [data-ogsc] table { background-color: #f1f5f9 !important; }
+  u + .body .gmail-fix { color: revert !important; }
+</style>
 </head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;color:#0C0C1E;-webkit-font-smoothing:antialiased;">
+<body class="body" style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;color:#0C0C1E;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Tienes nueva respuesta a "${title}".</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;">
     <tr><td align="center">
@@ -143,7 +157,6 @@ function renderEmailHTML({ name, title, link }: { name: string; title: string; l
         <tr><td style="background:#F0F5FF;padding:28px 36px;border-top:1px solid #DDE6F5;text-align:center;">
           <img src="${LOGO_URL}" alt="Holandés Nawar" height="28" style="display:inline-block;height:28px;width:auto;border:0;margin-bottom:12px;" />
           <p style="margin:0;font-size:12px;color:#475569;line-height:1.6;">
-            La comunidad para aprender neerlandés en español.<br>
             ¿Dudas? Escríbenos a <a href="mailto:${REPLY_TO}" style="color:#1D0084;text-decoration:none;font-weight:600;">${REPLY_TO}</a>
           </p>
         </td></tr>

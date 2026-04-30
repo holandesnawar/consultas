@@ -275,19 +275,26 @@
                     <span>Nueva Consulta</span>
                 </button>
                 <div class="flex items-center gap-2" id="mobileNav">
-                    <!-- Pills de estado: Todo / Pendientes / Resueltas -->
+                    <!-- Pills de estado: Todo / Pendientes / Resueltas (categorías van abajo en feed header) -->
                     <button data-filter="all" onclick="filterCategory(null, event)"
                         class="mobile-nav-link active whitespace-nowrap px-3.5 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
                     <button data-filter="pending" onclick="filterPending(event)"
                         class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
                     <button data-filter="resolved" onclick="filterResolved(event)"
                         class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
+                </div>
+            </div>
 
-                    <!-- Dropdown nativo de categorías (se renderiza como bottom sheet en iOS/Android) -->
-                    <div class="relative ml-auto flex-shrink-0">
+            <!-- Feed Header -->
+            <div class="mb-6 pb-4 border-b border-gray-200">
+                <h2 id="feedTitle" class="font-display text-2xl font-bold tracking-tight text-gray-900 mb-3">Todas las consultas</h2>
+
+                <!-- Móvil: filtro por categoría (reemplaza al "Ordenar por") -->
+                <div class="md:hidden">
+                    <div class="relative">
                         <select id="mobileCategorySelect" onchange="filterCategoryFromMobile(this.value)" aria-label="Filtrar por categoría"
-                            class="mobile-cat-select appearance-none bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 pl-9 pr-8 py-2 focus:outline-none focus:border-brand-600 cursor-pointer transition-colors">
-                            <option value="">Categoría</option>
+                            class="mobile-cat-select w-full appearance-none bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 pl-10 pr-9 py-2.5 focus:outline-none focus:border-brand-600 cursor-pointer transition-colors">
+                            <option value="">Todas las categorías</option>
                             <option value="acceso">Acceso y cuenta</option>
                             <option value="gramatica">Gramática</option>
                             <option value="comunidad">Comunidad</option>
@@ -295,16 +302,13 @@
                             <option value="tecnico">Problemas técnicos</option>
                             <option value="metodo">Método y Estudio</option>
                         </select>
-                        <i class="ph ph-funnel absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-base"></i>
-                        <i class="ph ph-caret-down absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs"></i>
+                        <i class="ph ph-funnel absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-base"></i>
+                        <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-sm"></i>
                     </div>
                 </div>
-            </div>
 
-            <!-- Feed Header -->
-            <div class="mb-6 pb-4 border-b border-gray-200">
-                <h2 id="feedTitle" class="font-display text-2xl font-bold tracking-tight text-gray-900 mb-2">Todas las consultas</h2>
-                <div class="flex items-center gap-4">
+                <!-- Desktop: ordenar por -->
+                <div class="hidden md:flex items-center gap-4">
                     <div class="flex items-center gap-2 text-sm">
                         <span class="text-gray-500">Ordenar por:</span>
                         <select id="sortSelect" onchange="loadFeed()"
@@ -339,7 +343,7 @@
         </main>
 
         <!-- Right Sidebar -->
-        <aside class="w-full md:w-72 flex-shrink-0 hidden lg:block space-y-4">
+        <aside class="w-full md:w-64 flex-shrink-0 hidden lg:block space-y-4">
             <!-- Card: Sobre las Consultas -->
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-soft">
                 <div class="flex items-start gap-3">
