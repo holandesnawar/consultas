@@ -192,20 +192,20 @@
                 <div>
                     <h3 class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Comunidad</h3>
                     <div class="space-y-1">
-                        <a href="#" data-filter="all" onclick="filterCategory(null, event)"
+                        <a href="#" data-filter="all" onclick="clearAllFilters(event)"
                             class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-house text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Todo el Feed
-                        </a>
-                        <a href="#" data-filter="pending" onclick="filterPending(event)"
-                            class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
-                            <i class="ph ph-clock text-lg text-gray-400 group-hover:text-gray-600"></i>
-                            Pendientes
                         </a>
                         <a href="#" data-filter="resolved" onclick="filterResolved(event)"
                             class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
                             <i class="ph ph-check-circle text-lg text-gray-400 group-hover:text-gray-600"></i>
                             Resueltas
+                        </a>
+                        <a href="#" data-filter="pending" onclick="filterPending(event)"
+                            class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors group">
+                            <i class="ph ph-clock text-lg text-gray-400 group-hover:text-gray-600"></i>
+                            Pendientes
                         </a>
                     </div>
                 </div>
@@ -275,13 +275,13 @@
                     <span>Nueva Consulta</span>
                 </button>
                 <div class="flex items-center gap-2" id="mobileNav">
-                    <!-- Pills de estado: Todo / Pendientes / Resueltas (categorías van abajo en feed header) -->
-                    <button data-filter="all" onclick="filterCategory(null, event)"
+                    <!-- Pills de estado: Todo / Resueltas / Pendientes (combinables con la categoría de abajo) -->
+                    <button data-filter="all" onclick="clearAllFilters(event)"
                         class="mobile-nav-link active whitespace-nowrap px-3.5 py-2 rounded-full text-sm font-medium transition-colors bg-brand-50 text-brand-600 border border-brand-200">Todo</button>
-                    <button data-filter="pending" onclick="filterPending(event)"
-                        class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
                     <button data-filter="resolved" onclick="filterResolved(event)"
                         class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Resueltas</button>
+                    <button data-filter="pending" onclick="filterPending(event)"
+                        class="mobile-nav-link whitespace-nowrap px-3.5 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 transition-colors">Pendientes</button>
                 </div>
             </div>
 
@@ -1180,75 +1180,94 @@
                 </div>`;
         }
 
+        // Filtros independientes: categoría y estado pueden combinarse
         function filterCategory(categoryName, event) {
             event?.preventDefault();
             currentCategoryFilter = categoryName;
-            currentResolvedFilter = null;
-            updateActiveNavLinks(categoryName, null);
+            // NO toca currentResolvedFilter (combinable)
+            updateActiveNavLinks();
             loadFeed();
         }
 
         function filterPending(event) {
             event?.preventDefault();
-            currentCategoryFilter = null;
-            currentResolvedFilter = false;
-            updateActiveNavLinks(null, false);
+            // Toggle: si ya está activo, lo desactiva
+            currentResolvedFilter = currentResolvedFilter === false ? null : false;
+            updateActiveNavLinks();
             loadFeed();
         }
 
         function filterResolved(event) {
             event?.preventDefault();
+            currentResolvedFilter = currentResolvedFilter === true ? null : true;
+            updateActiveNavLinks();
+            loadFeed();
+        }
+
+        // "Todo" limpia ambos filtros
+        function clearAllFilters(event) {
+            event?.preventDefault();
             currentCategoryFilter = null;
-            currentResolvedFilter = true;
-            updateActiveNavLinks(null, true);
+            currentResolvedFilter = null;
+            updateActiveNavLinks();
             loadFeed();
         }
 
-        // Mobile: cambio desde el <select> de categorías
+        // Mobile: cambio desde el <select> de categorías (no toca resolved)
         function filterCategoryFromMobile(categoryId) {
-            if (!categoryId) {
-                // Limpia y vuelve a "Todo"
-                currentCategoryFilter = null;
-                currentResolvedFilter = null;
-                updateActiveNavLinks(null, null);
-            } else {
-                filterCategory(categoryId);
-            }
+            currentCategoryFilter = categoryId || null;
+            updateActiveNavLinks();
             loadFeed();
         }
 
-        function updateActiveNavLinks(categoryName, resolvedFilter) {
+        // Activa visualmente UNO o VARIOS botones (filtros combinables)
+        function updateActiveNavLinks() {
+            // Reset todos
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-
-            let key = 'all';
-            if (resolvedFilter === false) key = 'pending';
-            else if (resolvedFilter === true) key = 'resolved';
-            else if (categoryName) key = categoryName;
-
-            document.querySelectorAll(`.nav-link[data-filter="${key}"]`).forEach(l => l.classList.add('active'));
-
             document.querySelectorAll('.mobile-nav-link').forEach(l => {
                 l.classList.remove('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
                 l.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
             });
-            document.querySelectorAll(`.mobile-nav-link[data-filter="${key}"]`).forEach(l => {
-                l.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
-                l.classList.add('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
+
+            const noFilters = !currentCategoryFilter && currentResolvedFilter === null;
+            const activeKeys = [];
+
+            if (noFilters) {
+                activeKeys.push('all');
+            } else {
+                if (currentResolvedFilter === false) activeKeys.push('pending');
+                if (currentResolvedFilter === true) activeKeys.push('resolved');
+                if (currentCategoryFilter) activeKeys.push(currentCategoryFilter);
+            }
+
+            // Activa cada uno
+            activeKeys.forEach(key => {
+                document.querySelectorAll(`.nav-link[data-filter="${key}"]`).forEach(l => l.classList.add('active'));
+                document.querySelectorAll(`.mobile-nav-link[data-filter="${key}"]`).forEach(l => {
+                    l.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                    l.classList.add('active', 'bg-brand-50', 'text-brand-600', 'border-brand-200');
+                });
             });
 
-            const title = document.getElementById('feedTitle');
-            if (resolvedFilter === false) title.textContent = 'Consultas pendientes';
-            else if (resolvedFilter === true) title.textContent = 'Consultas resueltas';
-            else if (categoryName) title.textContent = `Consultas: ${CAT_BY_ID[categoryName]?.name || categoryName}`;
-            else title.textContent = 'Todas las consultas';
-
-            // Sincronizar el <select> mobile de categorías
+            // Sincronizar select mobile de categorías
             const mobSelect = document.getElementById('mobileCategorySelect');
             if (mobSelect) {
-                mobSelect.value = categoryName || '';
-                if (categoryName) mobSelect.classList.add('is-active');
+                mobSelect.value = currentCategoryFilter || '';
+                if (currentCategoryFilter) mobSelect.classList.add('is-active');
                 else mobSelect.classList.remove('is-active');
             }
+
+            // Título combinado: "Consultas resueltas · Gramática" por ejemplo
+            const title = document.getElementById('feedTitle');
+            const parts = [];
+            if (currentResolvedFilter === false) parts.push('Consultas pendientes');
+            else if (currentResolvedFilter === true) parts.push('Consultas resueltas');
+            if (currentCategoryFilter) {
+                const catName = CAT_BY_ID[currentCategoryFilter]?.name || currentCategoryFilter;
+                if (parts.length) parts.push(catName);
+                else parts.push(`Consultas: ${catName}`);
+            }
+            title.textContent = parts.length ? parts.join(' · ') : 'Todas las consultas';
         }
 
         function buildCategoriesNav() {
