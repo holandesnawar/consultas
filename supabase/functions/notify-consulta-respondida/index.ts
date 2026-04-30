@@ -98,27 +98,15 @@ function renderEmailHTML({ name, title, link }: { name: string; title: string; l
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light only">
-<meta name="supported-color-schemes" content="light only">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>Respuesta a tu consulta · Holandés Nawar</title>
-<style>
-  :root { color-scheme: light only; supported-color-schemes: light only; }
-  /* Forzar colores en modo oscuro de Gmail/Apple Mail/Outlook */
-  @media (prefers-color-scheme: dark) {
-    body, table, td, div, p, h1, h2, h3, h4, span, a {
-      background-color: revert !important;
-      color: revert !important;
-    }
-  }
-  [data-ogsc] body, [data-ogsc] table { background-color: #f1f5f9 !important; }
-  u + .body .gmail-fix { color: revert !important; }
-</style>
 </head>
-<body class="body" style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;color:#0C0C1E;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background:#F4F4F7;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;color:#0C0C1E;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Tienes nueva respuesta a "${title}".</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F4F7;padding:32px 16px;">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(15,23,42,0.05);">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(15,23,42,0.06);">
 
         <!-- BANNER imagen -->
         <tr><td style="padding:0;line-height:0;font-size:0;">
@@ -126,26 +114,26 @@ function renderEmailHTML({ name, title, link }: { name: string; title: string; l
         </td></tr>
 
         <!-- BODY -->
-        <tr><td style="padding:36px 36px 8px;">
+        <tr><td style="padding:36px 36px 8px;background:#ffffff;">
           <div style="display:inline-block;background:#1D0084;color:#ffffff;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:6px 14px;border-radius:999px;text-transform:uppercase;margin-bottom:18px;">
             ✓ Consulta resuelta
           </div>
           <h1 style="margin:0 0 14px;font-size:24px;font-weight:800;letter-spacing:-0.5px;color:#0C0C1E;line-height:1.25;">
             ${name}, ya tenemos tu respuesta
           </h1>
-          <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#475569;">
+          <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#4B5563;">
             Acabamos de responder a tu consulta. Pulsa el botón para leerla en la comunidad.
           </p>
 
-          <!-- Question card sin línea izquierda -->
-          <div style="background:#F0F5FF;border:1px solid #DDE6F5;border-radius:12px;padding:18px 22px;margin:0 0 28px;">
+          <!-- Question card con fondo gris neutro (no se invierte a rosa en dark mode) -->
+          <div style="background:#F4F4F7;border:1px solid #E5E5EC;border-radius:12px;padding:18px 22px;margin:0 0 28px;">
             <div style="font-size:11px;font-weight:700;color:#1D0084;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Tu consulta</div>
             <div style="font-size:16px;font-weight:600;color:#0C0C1E;line-height:1.4;">${title}</div>
           </div>
         </td></tr>
 
         <!-- CTA -->
-        <tr><td style="padding:0 36px 40px;text-align:center;">
+        <tr><td style="padding:0 36px 40px;text-align:center;background:#ffffff;">
           <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td style="border-radius:12px;background:#1D0084;">
             <a href="${link}" style="display:inline-block;background:#1D0084;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 36px;border-radius:12px;letter-spacing:0.2px;">
               Ver respuesta
@@ -153,10 +141,10 @@ function renderEmailHTML({ name, title, link }: { name: string; title: string; l
           </td></tr></table>
         </td></tr>
 
-        <!-- FOOTER: logo arriba, texto abajo -->
-        <tr><td style="background:#F0F5FF;padding:28px 36px;border-top:1px solid #DDE6F5;text-align:center;">
+        <!-- FOOTER: logo arriba, texto abajo (gris neutro) -->
+        <tr><td style="background:#F4F4F7;padding:28px 36px;border-top:1px solid #E5E5EC;text-align:center;">
           <img src="${LOGO_URL}" alt="Holandés Nawar" height="28" style="display:inline-block;height:28px;width:auto;border:0;margin-bottom:12px;" />
-          <p style="margin:0;font-size:12px;color:#475569;line-height:1.6;">
+          <p style="margin:0;font-size:12px;color:#4B5563;line-height:1.6;">
             ¿Dudas? Escríbenos a <a href="mailto:${REPLY_TO}" style="color:#1D0084;text-decoration:none;font-weight:600;">${REPLY_TO}</a>
           </p>
         </td></tr>
