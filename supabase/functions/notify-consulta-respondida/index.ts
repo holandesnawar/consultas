@@ -91,6 +91,8 @@ serve(async (req: Request) => {
 
 // =================== EMAIL TEMPLATE ===================
 function renderEmailHTML({ name, title, link }: { name: string; title: string; link: string }) {
+  const BANNER_URL = "https://docs.holandesnawar.com/img/Banner.mail.png";
+  const LOGO_URL = "https://docs.holandesnawar.com/img/Nawar.png";
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -98,65 +100,51 @@ function renderEmailHTML({ name, title, link }: { name: string; title: string; l
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Respuesta a tu consulta · Holandés Nawar</title>
 </head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;color:#0f172a;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;color:#0C0C1E;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;color:transparent;">Tienes nueva respuesta a "${title}".</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 16px;">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(15,23,42,0.05);">
 
-        <!-- HEADER -->
-        <tr><td style="background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);padding:32px 32px 28px;text-align:center;">
-          <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td>
-            <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-              <td style="background:#ffffff;width:48px;height:48px;border-radius:14px;text-align:center;vertical-align:middle;line-height:48px;">
-                <span style="color:#2563eb;font-size:22px;font-weight:800;letter-spacing:-0.5px;">N</span>
-              </td>
-              <td style="padding-left:14px;text-align:left;">
-                <div style="color:#ffffff;font-weight:700;font-size:18px;line-height:1.2;letter-spacing:-0.3px;">Holandés Nawar</div>
-                <div style="color:rgba(255,255,255,0.75);font-size:13px;font-weight:500;margin-top:2px;">Comunidad de aprendizaje</div>
-              </td>
-            </tr></table>
-          </td></tr></table>
+        <!-- BANNER imagen -->
+        <tr><td style="padding:0;line-height:0;font-size:0;">
+          <img src="${BANNER_URL}" alt="Holandés Nawar" width="560" style="display:block;width:100%;height:auto;border:0;outline:none;text-decoration:none;" />
         </td></tr>
 
         <!-- BODY -->
         <tr><td style="padding:36px 36px 8px;">
-          <div style="display:inline-block;background:#dbeafe;color:#1e40af;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 12px;border-radius:999px;text-transform:uppercase;margin-bottom:18px;">
-            Consulta resuelta
+          <div style="display:inline-block;background:#1D0084;color:#ffffff;font-size:11px;font-weight:700;letter-spacing:1.5px;padding:6px 14px;border-radius:999px;text-transform:uppercase;margin-bottom:18px;">
+            ✓ Consulta resuelta
           </div>
-          <h1 style="margin:0 0 14px;font-size:24px;font-weight:800;letter-spacing:-0.5px;color:#0f172a;line-height:1.25;">
-            Hola ${name}, tenemos respuesta para ti.
+          <h1 style="margin:0 0 14px;font-size:24px;font-weight:800;letter-spacing:-0.5px;color:#0C0C1E;line-height:1.25;">
+            ${name}, ya tenemos tu respuesta
           </h1>
           <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#475569;">
-            Hemos respondido a tu consulta. Pulsa el botón para leerla en la comunidad y, si quieres, dejarnos tus comentarios.
+            Acabamos de responder a tu consulta. Pulsa el botón para leerla en la comunidad.
           </p>
 
-          <!-- Question card -->
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #2563eb;border-radius:12px;padding:18px 22px;margin:0 0 28px;">
-            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Tu consulta</div>
-            <div style="font-size:16px;font-weight:600;color:#0f172a;line-height:1.4;">${title}</div>
+          <!-- Question card sin línea izquierda -->
+          <div style="background:#F0F5FF;border:1px solid #DDE6F5;border-radius:12px;padding:18px 22px;margin:0 0 28px;">
+            <div style="font-size:11px;font-weight:700;color:#1D0084;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Tu consulta</div>
+            <div style="font-size:16px;font-weight:600;color:#0C0C1E;line-height:1.4;">${title}</div>
           </div>
         </td></tr>
 
         <!-- CTA -->
-        <tr><td style="padding:0 36px 36px;text-align:center;">
-          <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td style="border-radius:12px;background:#2563eb;">
-            <a href="${link}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 32px;border-radius:12px;letter-spacing:0.2px;">
-              Ver respuesta en la comunidad →
+        <tr><td style="padding:0 36px 40px;text-align:center;">
+          <table role="presentation" cellpadding="0" cellspacing="0" align="center"><tr><td style="border-radius:12px;background:#1D0084;">
+            <a href="${link}" style="display:inline-block;background:#1D0084;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 36px;border-radius:12px;letter-spacing:0.2px;">
+              Ver respuesta
             </a>
           </td></tr></table>
-          <p style="margin:18px 0 0;color:#94a3b8;font-size:12px;line-height:1.5;">
-            ¿No te abre el botón? Copia esta dirección:<br>
-            <a href="${link}" style="color:#2563eb;word-break:break-all;text-decoration:none;">${link}</a>
-          </p>
         </td></tr>
 
-        <!-- FOOTER -->
-        <tr><td style="background:#f8fafc;padding:24px 36px;border-top:1px solid #e2e8f0;text-align:center;">
-          <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#0f172a;">Holandés Nawar</p>
-          <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">
+        <!-- FOOTER: logo arriba, texto abajo -->
+        <tr><td style="background:#F0F5FF;padding:28px 36px;border-top:1px solid #DDE6F5;text-align:center;">
+          <img src="${LOGO_URL}" alt="Holandés Nawar" height="28" style="display:inline-block;height:28px;width:auto;border:0;margin-bottom:12px;" />
+          <p style="margin:0;font-size:12px;color:#475569;line-height:1.6;">
             La comunidad para aprender neerlandés en español.<br>
-            ¿Dudas? Escríbenos a <a href="mailto:${REPLY_TO}" style="color:#2563eb;text-decoration:none;">${REPLY_TO}</a>
+            ¿Dudas? Escríbenos a <a href="mailto:${REPLY_TO}" style="color:#1D0084;text-decoration:none;font-weight:600;">${REPLY_TO}</a>
           </p>
         </td></tr>
       </table>

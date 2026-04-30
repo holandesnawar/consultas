@@ -146,6 +146,17 @@
             color: #ffffff !important;
         }
         .mobile-cat-select.is-active ~ i { color: rgba(255,255,255,0.85) !important; }
+
+        /* CTA marca (Nueva Consulta, Cerrar, etc.) — hover sutil sin saltos */
+        .cta-brand:hover { background-color: #2A1099; }
+
+        /* Backdrop con blur — pre-renderizado para evitar lag al abrir */
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            will-change: opacity;
+        }
     </style>
 </head>
 
@@ -153,11 +164,9 @@
 
     <!-- Mobile top bar: solo la mini-info -->
     <div class="md:hidden px-4 pt-4 w-full overflow-hidden">
-        <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-soft">
-            <div class="flex items-start gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
-                    <i class="ph-fill ph-info text-brand-600 text-base"></i>
-                </div>
+        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-soft">
+            <div class="flex items-start gap-3">
+                <i class="ph-fill ph-info text-brand-600 text-3xl flex-shrink-0 leading-none"></i>
                 <div class="min-w-0">
                     <h3 class="font-bold text-sm text-gray-900 leading-tight">Sobre las Consultas</h3>
                     <p class="text-xs text-gray-600 leading-relaxed mt-0.5">
@@ -168,14 +177,14 @@
         </div>
     </div>
 
-    <div class="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 flex flex-col md:flex-row gap-8">
+    <div class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-4 lg:px-6 py-4 md:py-8 flex flex-col md:flex-row gap-6">
 
         <!-- Left Sidebar -->
         <aside class="w-full md:w-64 flex-shrink-0 hidden md:block">
             <div class="sticky top-8 space-y-8">
 
                 <button onclick="openModal()" aria-label="Abrir nueva consulta"
-                    class="w-full flex items-center justify-center gap-2 bg-brand-600 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating transition-all transform hover:-translate-y-0.5">
+                    class="cta-brand w-full flex items-center justify-center gap-2 bg-brand-600 text-white px-4 py-2.5 rounded-xl font-medium shadow-floating transition-colors">
                     <i class="ph ph-pencil-simple text-lg"></i>
                     Nueva Consulta
                 </button>
@@ -334,9 +343,7 @@
             <!-- Card: Sobre las Consultas -->
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-soft">
                 <div class="flex items-start gap-3">
-                    <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
-                        <i class="ph-fill ph-info text-brand-600 text-lg"></i>
-                    </div>
+                    <i class="ph-fill ph-info text-brand-600 text-3xl flex-shrink-0 leading-none"></i>
                     <div class="min-w-0">
                         <h3 class="font-bold text-sm text-gray-900 leading-tight">Sobre las Consultas</h3>
                         <p class="text-xs text-gray-600 leading-relaxed mt-1">
@@ -349,9 +356,7 @@
             <!-- Card: Tip buscar -->
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-soft">
                 <div class="flex items-start gap-3">
-                    <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
-                        <i class="ph-fill ph-lightbulb text-brand-600 text-lg"></i>
-                    </div>
+                    <i class="ph-fill ph-lightbulb text-brand-600 text-3xl flex-shrink-0 leading-none"></i>
                     <div class="min-w-0">
                         <h3 class="font-bold text-sm text-gray-900 leading-tight">Tip rápido</h3>
                         <p class="text-xs text-gray-600 leading-relaxed mt-1">
@@ -364,13 +369,11 @@
             <!-- Card: Tiempo de respuesta -->
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-soft">
                 <div class="flex items-start gap-3">
-                    <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center flex-shrink-0">
-                        <i class="ph-fill ph-clock text-brand-600 text-lg"></i>
-                    </div>
+                    <i class="ph-fill ph-clock text-brand-600 text-3xl flex-shrink-0 leading-none"></i>
                     <div class="min-w-0">
                         <h3 class="font-bold text-sm text-gray-900 leading-tight">Tiempo de respuesta</h3>
                         <p class="text-xs text-gray-600 leading-relaxed mt-1">
-                            Solemos responder en menos de 24&nbsp;h hábiles. Te llegará un email con el aviso.
+                            Solemos responder en menos de 24&nbsp;h. Te llegará un email con el aviso.
                         </p>
                     </div>
                 </div>
@@ -381,7 +384,7 @@
     <!-- New Consultation Modal -->
     <div id="newPostModal" role="dialog" aria-modal="true" aria-labelledby="newPostModalTitle"
         class="fixed inset-0 z-50 flex items-start justify-center pt-20 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
-        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute inset-0 modal-backdrop" onclick="closeModal()"></div>
 
         <div class="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] transform scale-95 transition-transform duration-150"
             id="modalContainer">
@@ -389,7 +392,7 @@
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <h2 id="newPostModalTitle" class="font-display text-xl font-bold text-gray-900">Abre una nueva consulta</h2>
                 <button onclick="closeModal()" aria-label="Cerrar modal"
-                    class="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-brand-50 hover:text-brand-600 rounded-full">
+                    class="text-gray-400 hover:text-gray-900 transition-colors p-2 rounded-lg">
                     <i class="ph ph-x text-xl"></i>
                 </button>
             </div>
@@ -476,7 +479,7 @@
     <!-- View Detail Modal -->
     <div id="viewPostModal" role="dialog" aria-modal="true"
         class="fixed inset-0 z-50 flex items-start justify-center pt-20 md:pt-10 px-3 hidden opacity-0 transition-opacity duration-150">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" onclick="closeViewModal()"></div>
+        <div class="absolute inset-0 modal-backdrop" onclick="closeViewModal()"></div>
 
         <div class="relative bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] transform scale-95 transition-transform duration-150 overflow-hidden"
             id="viewModalContainer">
@@ -495,12 +498,12 @@
                         </button>
                     </div>
                     <button onclick="copyDeeplink()" aria-label="Copiar enlace" title="Copiar enlace"
-                        class="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-brand-50 hover:text-brand-600 rounded-lg">
-                        <i class="ph ph-link text-base"></i>
+                        class="text-gray-400 hover:text-brand-600 transition-colors p-2 rounded-lg">
+                        <i class="ph ph-link text-xl"></i>
                     </button>
                     <button onclick="closeViewModal()" aria-label="Cerrar modal"
-                        class="text-gray-400 hover:text-gray-600 transition-colors p-1.5 hover:bg-brand-50 hover:text-brand-600 rounded-lg">
-                        <i class="ph ph-x text-lg"></i>
+                        class="text-gray-400 hover:text-gray-900 transition-colors p-2 rounded-lg">
+                        <i class="ph ph-x text-xl"></i>
                     </button>
                 </div>
             </div>
@@ -543,7 +546,7 @@
 
             <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
                 <button onclick="closeViewModal()"
-                    class="px-6 py-2.5 bg-brand-600 text-white font-bold rounded-xl shadow-floating transition-all active:scale-95">
+                    class="cta-brand inline-flex items-center justify-center gap-2 bg-brand-600 text-white px-6 py-2.5 rounded-xl font-medium shadow-floating transition-colors">
                     Cerrar
                 </button>
             </div>
