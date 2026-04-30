@@ -139,13 +139,13 @@
             border-radius: 3px;
         }
 
-        /* Mobile category select: estado activo con color de marca */
+        /* Mobile category select: estado activo con el mismo estilo que los pills "Todo/Resueltas" */
         .mobile-cat-select.is-active {
-            background-color: #1D0084 !important;
-            border-color: #1D0084 !important;
-            color: #ffffff !important;
+            background-color: #F0F5FF !important;
+            border-color: #BFDBFE !important;
+            color: #1D0084 !important;
         }
-        .mobile-cat-select.is-active ~ i { color: rgba(255,255,255,0.85) !important; }
+        .mobile-cat-select.is-active ~ i { color: #1D0084 !important; }
 
         /* CTA marca (Nueva Consulta, Cerrar, etc.) — hover sutil sin saltos */
         .cta-brand:hover { background-color: #2A1099; }
@@ -287,7 +287,7 @@
 
             <!-- Feed Header -->
             <div class="mb-6 pb-4 border-b border-gray-200">
-                <h2 id="feedTitle" class="font-display text-2xl font-bold tracking-tight text-gray-900 mb-3">Todas las consultas</h2>
+                <h2 id="feedTitle" class="font-display text-lg md:text-2xl font-bold tracking-tight text-gray-900 mb-3 leading-tight">Todas las consultas</h2>
 
                 <!-- Móvil: filtro por categoría (reemplaza al "Ordenar por") -->
                 <div class="md:hidden">
@@ -1257,17 +1257,16 @@
                 else mobSelect.classList.remove('is-active');
             }
 
-            // Título combinado: "Consultas resueltas · Gramática" por ejemplo
+            // Título combinado, conciso y natural
             const title = document.getElementById('feedTitle');
-            const parts = [];
-            if (currentResolvedFilter === false) parts.push('Consultas pendientes');
-            else if (currentResolvedFilter === true) parts.push('Consultas resueltas');
-            if (currentCategoryFilter) {
-                const catName = CAT_BY_ID[currentCategoryFilter]?.name || currentCategoryFilter;
-                if (parts.length) parts.push(catName);
-                else parts.push(`Consultas: ${catName}`);
-            }
-            title.textContent = parts.length ? parts.join(' · ') : 'Todas las consultas';
+            const catName = currentCategoryFilter ? (CAT_BY_ID[currentCategoryFilter]?.name || currentCategoryFilter) : null;
+            let titleText = 'Todas las consultas';
+            if (currentResolvedFilter === false && catName) titleText = `Pendientes en ${catName}`;
+            else if (currentResolvedFilter === true && catName) titleText = `Resueltas en ${catName}`;
+            else if (currentResolvedFilter === false) titleText = 'Consultas pendientes';
+            else if (currentResolvedFilter === true) titleText = 'Consultas resueltas';
+            else if (catName) titleText = catName;
+            title.textContent = titleText;
         }
 
         function buildCategoriesNav() {
